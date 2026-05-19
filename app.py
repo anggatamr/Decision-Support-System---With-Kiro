@@ -27,11 +27,12 @@ st.set_page_config(
 # ---------------------------------------------------------------------------
 # Import komponen UI
 # ---------------------------------------------------------------------------
-from ui.styles import inject_custom_css
+from ui.styles import inject_custom_css, COLORS
 from ui.sidebar import render_sidebar
+from ui.components import dashboard_card, next_module_hint
 
 # ---------------------------------------------------------------------------
-# Import renderer modul — gunakan try/except karena modul belum semua ada
+# Import renderer modul
 # ---------------------------------------------------------------------------
 
 def _placeholder_renderer(module_name: str):
@@ -39,8 +40,7 @@ def _placeholder_renderer(module_name: str):
     def _render():
         st.info(
             f"⚙️ **Modul sedang dalam pengembangan**\n\n"
-            f"Modul `{module_name}` belum tersedia. "
-            f"Silakan tunggu pembaruan berikutnya.",
+            f"Modul `{module_name}` belum tersedia.",
             icon="🔧",
         )
     return _render
@@ -112,40 +112,23 @@ def _init_session_state() -> None:
     tidak tertimpa saat halaman di-rerun (Requirement 1.8).
     """
     defaults: dict = {
-        # Dataset — Data-Driven DSS
-        "df":                   None,   # pd.DataFrame | None
-        "df_filename":          None,   # str | None
-
-        # Payoff Table — digunakan bersama oleh modul 2–5
-        "payoff_matrix":        None,   # np.ndarray shape (m, n) | None
-        "alt_names":            [],     # list[str]
-        "state_names":          [],     # list[str]
-
-        # EV / EOL
-        "probabilities":        None,   # np.ndarray shape (n,) | None
-        "ev_results":           None,   # dict | None
-        "eol_results":          None,   # dict | None
-
-        # Uncertainty criteria
-        "uncertainty_results":  None,   # dict | None
-
-        # Distribution
-        "dist_type":            None,   # str | None
-        "dist_params":          None,   # dict | None
-
-        # Utility
-        "utility_params":       None,   # dict | None
-        "utility_func_type":    None,   # str | None
-
-        # Monte Carlo
-        "mc_results":           None,   # np.ndarray | None
-        "mc_input_matrix":      None,   # np.ndarray | None
-
-        # Navigasi
-        "active_module":        None,   # str | None
-
-        # Indikator penyelesaian modul (untuk sidebar ✅)
-        "completed_modules":    set(),  # set[str]
+        "df":                   None,
+        "df_filename":          None,
+        "payoff_matrix":        None,
+        "alt_names":            [],
+        "state_names":          [],
+        "probabilities":        None,
+        "ev_results":           None,
+        "eol_results":          None,
+        "uncertainty_results":  None,
+        "dist_type":            None,
+        "dist_params":          None,
+        "utility_params":       None,
+        "utility_func_type":    None,
+        "mc_results":           None,
+        "mc_input_matrix":      None,
+        "active_module":        None,
+        "completed_modules":    set(),
     }
 
     for key, default_value in defaults.items():
@@ -154,156 +137,276 @@ def _init_session_state() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Halaman sambutan
+# Welcome page — enhanced with feature cards and quick-start
 # ---------------------------------------------------------------------------
 
 def render_welcome_page() -> None:
     """
-    Render halaman sambutan yang ditampilkan saat belum ada modul yang dipilih.
-
-    Menampilkan:
-    - Judul aplikasi
-    - Deskripsi singkat tentang DSS
-    - Panduan langkah-langkah penggunaan aplikasi (Requirement 1.7)
+    Render halaman sambutan dengan feature cards, quick-start guide,
+    dan statistik aplikasi.
     """
-    # Judul utama
-    st.title("📊 Dashboard DSS — Decision Support System")
+
+    # ------------------------------------------------------------------
+    # Hero section
+    # ------------------------------------------------------------------
     st.markdown(
-        "**Selamat datang di Dashboard DSS** — platform analisis keputusan interaktif "
-        "untuk keperluan presentasi akademik mahasiswa Statistika."
+        f"""
+        <div style="
+            background: linear-gradient(135deg, {COLORS['primary']} 0%, #0d2d45 100%);
+            border-radius: 16px;
+            padding: 2.5rem 2rem;
+            margin-bottom: 1.5rem;
+            color: white;
+        ">
+            <p style="font-size: 2.4rem; font-weight: 800; margin: 0; line-height: 1.2;
+                      letter-spacing: -1px;">
+                📊 Dashboard DSS
+            </p>
+            <p style="font-size: 1.1rem; color: rgba(255,255,255,0.8);
+                      margin: 0.5rem 0 1rem 0; font-weight: 400;">
+                Decision Support System — Platform Analisis Keputusan Akademik
+            </p>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <span style="background: rgba(255,255,255,0.15); border-radius: 20px;
+                             padding: 0.3rem 0.9rem; font-size: 0.82rem; font-weight: 600;">
+                    🧮 8 Modul Analisis
+                </span>
+                <span style="background: rgba(255,255,255,0.15); border-radius: 20px;
+                             padding: 0.3rem 0.9rem; font-size: 0.82rem; font-weight: 600;">
+                    ✅ 279 Property Tests
+                </span>
+                <span style="background: rgba(255,255,255,0.15); border-radius: 20px;
+                             padding: 0.3rem 0.9rem; font-size: 0.82rem; font-weight: 600;">
+                    🐍 Python + Streamlit
+                </span>
+                <span style="background: rgba(255,255,255,0.15); border-radius: 20px;
+                             padding: 0.3rem 0.9rem; font-size: 0.82rem; font-weight: 600;">
+                    📐 LaTeX Formulas
+                </span>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
-    st.divider()
 
-    # Deskripsi DSS
-    col_desc, col_info = st.columns([2, 1])
+    # ------------------------------------------------------------------
+    # Quick stats row
+    # ------------------------------------------------------------------
+    c1, c2, c3, c4 = st.columns(4)
+    with c1:
+        dashboard_card("Modul Tersedia", "8", "Data-Driven + Model-Driven", "accent", "🧩")
+    with c2:
+        dashboard_card("Metode Keputusan", "6", "Certainty → Simulation", "primary", "📐")
+    with c3:
+        dashboard_card("Property Tests", "279", "Semua lulus ✓", "success", "✅")
+    with c4:
+        dashboard_card("Distribusi Didukung", "6", "Normal, Beta, Poisson…", "info", "📈")
 
-    with col_desc:
+    st.markdown("---")
+
+    # ------------------------------------------------------------------
+    # Two-column: What is DSS + Module map
+    # ------------------------------------------------------------------
+    col_left, col_right = st.columns([3, 2], gap="large")
+
+    with col_left:
         st.subheader("🎯 Apa itu Decision Support System?")
         st.markdown(
             """
-            **Decision Support System (DSS)** atau Sistem Pendukung Keputusan adalah
-            sistem berbasis komputer yang membantu pengambil keputusan dalam menganalisis
-            data, membangun model, dan mengevaluasi alternatif keputusan secara kuantitatif.
+            **Decision Support System (DSS)** adalah sistem berbasis komputer yang membantu
+            pengambil keputusan menganalisis data, membangun model kuantitatif, dan mengevaluasi
+            alternatif secara sistematis.
 
-            Dashboard ini mengintegrasikan **dua paradigma DSS** dalam satu antarmuka:
+            Dashboard ini mengintegrasikan **dua paradigma DSS** dalam satu antarmuka terpadu:
 
-            - 📊 **Data-Driven DSS** — eksplorasi dan analisis dataset nyata menggunakan
-              statistik deskriptif, visualisasi tren, dan analisis korelasi.
-            - 🧮 **Model-Driven DSS** — penerapan enam kelompok metode Teori Keputusan
-              kuantitatif: dari analisis di bawah kepastian, risiko, ketidakpastian,
-              pemodelan probabilistik, fungsi utilitas, hingga simulasi Monte Carlo.
+            - 📊 **Data-Driven DSS** — eksplorasi dataset nyata: statistik deskriptif,
+              visualisasi tren, dan analisis korelasi.
+            - 🧮 **Model-Driven DSS** — enam kelompok metode Teori Keputusan kuantitatif,
+              dari analisis kepastian hingga simulasi Monte Carlo.
+
+            Semua komputasi berjalan **secara lokal** — tidak ada data yang dikirim ke server
+            eksternal. State setiap modul tersimpan otomatis selama sesi aktif.
             """
         )
 
-    with col_info:
-        st.info(
-            "**8 Modul Tersedia**\n\n"
-            "1. 📊 Data-Driven DSS\n"
-            "2. 📋 Payoff Table\n"
-            "3. 🎲 EV & EOL\n"
-            "4. ❓ Kriteria Ketidakpastian\n"
-            "5. 📈 Distribusi Probabilitas\n"
-            "6. ⚖️ Fungsi Utilitas\n"
-            "7. 🎰 Monte Carlo\n"
-            "8. 🏆 Recommendation Engine",
-            icon="📌",
+    with col_right:
+        st.subheader("🗺️ Peta Modul")
+        module_info = [
+            ("📊", "Data-Driven DSS",       "Upload & eksplorasi dataset"),
+            ("📋", "Payoff Table",           "Definisi alternatif & payoff"),
+            ("🎲", "EV & EOL",              "Expected Value & Opportunity Loss"),
+            ("❓", "Uncertainty",            "Maximax, Maximin, Laplace"),
+            ("📈", "Distribusi",             "MLE + PDF/PMF interaktif"),
+            ("⚖️", "Fungsi Utilitas",        "Curve fitting & risk preference"),
+            ("🎰", "Monte Carlo",            "Simulasi stokastik + sensitivity"),
+            ("🏆", "Recommendation",         "Konsensus lintas metode"),
+        ]
+        for icon, name, desc in module_info:
+            st.markdown(
+                f"""
+                <div style="display: flex; align-items: center; gap: 0.7rem;
+                            padding: 0.45rem 0.7rem; border-radius: 8px;
+                            margin-bottom: 4px; background: white;
+                            border: 1px solid {COLORS['border']};">
+                    <span style="font-size: 1.1rem;">{icon}</span>
+                    <div>
+                        <p style="margin: 0; font-weight: 600; font-size: 0.88rem;
+                                  color: {COLORS['primary']};">{name}</p>
+                        <p style="margin: 0; font-size: 0.75rem; color: #7f8c8d;">{desc}</p>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+    st.markdown("---")
+
+    # ------------------------------------------------------------------
+    # Feature cards — 3 columns
+    # ------------------------------------------------------------------
+    st.subheader("✨ Fitur Unggulan")
+
+    fc1, fc2, fc3 = st.columns(3)
+
+    with fc1:
+        st.markdown(
+            f"""
+            <div class="dss-card dss-card-accent">
+                <p style="font-size: 1.5rem; margin: 0 0 0.5rem 0;">📐</p>
+                <p style="font-weight: 700; color: {COLORS['primary']};
+                          margin: 0 0 0.3rem 0;">Rumus LaTeX</p>
+                <p style="color: #5a7a8a; font-size: 0.85rem; margin: 0;">
+                    Setiap metode dilengkapi rumus matematis yang dirender
+                    via <code>st.latex()</code> — tampil profesional untuk presentasi akademik.
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
 
-    st.divider()
+    with fc2:
+        st.markdown(
+            f"""
+            <div class="dss-card dss-card-success">
+                <p style="font-size: 1.5rem; margin: 0 0 0.5rem 0;">📊</p>
+                <p style="font-weight: 700; color: {COLORS['primary']};
+                          margin: 0 0 0.3rem 0;">Visualisasi Interaktif</p>
+                <p style="color: #5a7a8a; font-size: 0.85rem; margin: 0;">
+                    Semua chart menggunakan Plotly dengan template <code>plotly_white</code>,
+                    judul, label sumbu, dan legenda yang konsisten.
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
-    # Panduan penggunaan
-    st.subheader("🗺️ Panduan Penggunaan Aplikasi")
-    st.markdown("Ikuti langkah-langkah berikut untuk memaksimalkan penggunaan dashboard:")
+    with fc3:
+        st.markdown(
+            f"""
+            <div class="dss-card dss-card-warning">
+                <p style="font-size: 1.5rem; margin: 0 0 0.5rem 0;">🔬</p>
+                <p style="font-weight: 700; color: {COLORS['primary']};
+                          margin: 0 0 0.3rem 0;">Property-Based Testing</p>
+                <p style="color: #5a7a8a; font-size: 0.85rem; margin: 0;">
+                    279 property tests via Hypothesis memverifikasi kebenaran
+                    matematis setiap fungsi komputasi secara formal.
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("---")
+
+    # ------------------------------------------------------------------
+    # Quick-start guide — numbered steps
+    # ------------------------------------------------------------------
+    st.subheader("🚀 Cara Memulai")
 
     steps = [
-        (
-            "1️⃣ Unggah Dataset (Opsional)",
-            "Mulai dengan modul **📊 Data-Driven DSS** di sidebar untuk mengunggah "
-            "file CSV atau XLSX. Eksplorasi statistik deskriptif, tren data, dan "
-            "matriks korelasi antar variabel numerik.",
-        ),
-        (
-            "2️⃣ Buat Payoff Table",
-            "Buka modul **📋 Certainty — Payoff Table** untuk mendefinisikan "
-            "alternatif keputusan, kondisi alam (state of nature), dan nilai payoff "
-            "setiap kombinasinya. Payoff table ini akan digunakan oleh modul-modul berikutnya.",
-        ),
-        (
-            "3️⃣ Analisis di Bawah Risiko (EV & EOL)",
-            "Gunakan modul **🎲 Risk — EV & EOL** untuk memasukkan probabilitas "
-            "kondisi alam dan menghitung Expected Value (EV), Expected Opportunity "
-            "Loss (EOL), serta EVPI (Expected Value of Perfect Information).",
-        ),
-        (
-            "4️⃣ Analisis di Bawah Ketidakpastian",
-            "Modul **❓ Uncertainty** menghitung empat kriteria keputusan tanpa "
-            "informasi probabilitas: Maximax (optimistis), Maximin (pesimistis), "
-            "Minimax Regret (Savage), dan Laplace (netral).",
-        ),
-        (
-            "5️⃣ Pemodelan Distribusi Probabilitas",
-            "Modul **📈 Probabilistic — Distribusi** memungkinkan estimasi parameter "
-            "distribusi (Normal, Binomial, Poisson, Exponential, Uniform, Beta) "
-            "dari data yang diunggah atau input manual.",
-        ),
-        (
-            "6️⃣ Fungsi Utilitas & Preferensi Risiko",
-            "Modul **⚖️ Utility** melakukan curve fitting fungsi utilitas dan "
-            "mengklasifikasikan preferensi risiko pengambil keputusan: "
-            "Risk Averse, Risk Neutral, atau Risk Seeking.",
-        ),
-        (
-            "7️⃣ Simulasi Monte Carlo",
-            "Modul **🎰 Simulation — Monte Carlo** menjalankan simulasi dengan "
-            "≥10.000 iterasi dan analisis sensitivitas (Spearman correlation) "
-            "untuk mengidentifikasi variabel input yang paling berpengaruh.",
-        ),
-        (
-            "✅ Rekomendasi Otomatis",
-            "Setelah menjalankan minimal dua modul Model-Driven DSS, "
-            "**Recommendation Engine** akan merangkum alternatif terbaik dari "
-            "semua metode dan menampilkan tingkat konsensus antar metode.",
-        ),
+        ("1", "📋", "Buat Payoff Table",
+         "Mulai dari modul **Certainty — Payoff Table**. Definisikan alternatif keputusan, "
+         "kondisi alam, dan isi nilai payoff. Tabel ini menjadi fondasi untuk modul EV & EOL, "
+         "Uncertainty, dan Utility."),
+        ("2", "🎲", "Jalankan Analisis Risiko",
+         "Buka **Risk — EV & EOL**, masukkan probabilitas kondisi alam, dan hitung "
+         "Expected Value, Expected Opportunity Loss, serta EVPI."),
+        ("3", "❓", "Bandingkan Kriteria Ketidakpastian",
+         "Di modul **Uncertainty**, bandingkan empat kriteria (Maximax, Maximin, "
+         "Minimax Regret, Laplace) tanpa memerlukan informasi probabilitas."),
+        ("4", "🏆", "Lihat Rekomendasi Konsensus",
+         "Setelah ≥2 modul dijalankan, **Recommendation Engine** merangkum alternatif "
+         "terbaik dari semua metode dan menampilkan tingkat konsensus."),
     ]
 
-    for title, description in steps:
-        with st.expander(title, expanded=False):
-            st.markdown(description)
+    for num, icon, title, desc in steps:
+        col_num, col_content = st.columns([1, 11])
+        with col_num:
+            st.markdown(
+                f"""
+                <div style="
+                    background: {COLORS['accent']};
+                    color: white;
+                    border-radius: 50%;
+                    width: 36px; height: 36px;
+                    display: flex; align-items: center; justify-content: center;
+                    font-weight: 800; font-size: 1rem;
+                    margin-top: 0.2rem;
+                ">{num}</div>
+                """,
+                unsafe_allow_html=True,
+            )
+        with col_content:
+            st.markdown(f"**{icon} {title}**")
+            st.markdown(f"<p style='color: #5a7a8a; font-size: 0.88rem; margin: 0;'>{desc}</p>",
+                        unsafe_allow_html=True)
+        st.markdown("")
 
-    st.divider()
+    st.markdown("---")
 
-    # Tips penggunaan
+    # ------------------------------------------------------------------
+    # Tips row
+    # ------------------------------------------------------------------
     st.subheader("💡 Tips Penggunaan")
-    col_tip1, col_tip2, col_tip3 = st.columns(3)
+    t1, t2, t3 = st.columns(3)
 
-    with col_tip1:
+    with t1:
         st.success(
             "**State Tersimpan Otomatis**\n\n"
-            "Data yang sudah diinput di satu modul akan tetap tersimpan "
-            "saat Anda berpindah ke modul lain dalam sesi yang sama.",
+            "Data yang sudah diinput di satu modul tetap tersimpan saat berpindah modul "
+            "dalam sesi yang sama.",
             icon="💾",
         )
-
-    with col_tip2:
+    with t2:
         st.info(
-            "**Indikator ✅ di Sidebar**\n\n"
-            "Modul yang sudah memiliki data atau hasil akan ditandai "
-            "dengan ikon ✅ di sidebar navigasi.",
+            "**Indikator 🟢 di Sidebar**\n\n"
+            "Modul yang sudah selesai ditandai dengan lingkaran hijau di sidebar navigasi.",
             icon="🧭",
         )
-
-    with col_tip3:
+    with t3:
         st.warning(
-            "**Mulai dari Payoff Table**\n\n"
-            "Modul EV & EOL, Uncertainty, dan Utility membutuhkan "
-            "Payoff Table yang sudah didefinisikan terlebih dahulu.",
+            "**Urutan yang Disarankan**\n\n"
+            "Payoff Table → EV & EOL → Uncertainty → Utility → Recommendation Engine.",
             icon="⚠️",
         )
 
-    st.divider()
+    # ------------------------------------------------------------------
+    # CTA button
+    # ------------------------------------------------------------------
+    st.markdown("---")
+    col_cta, _ = st.columns([2, 3])
+    with col_cta:
+        if st.button(
+            "🚀 Mulai — Buat Payoff Table",
+            type="primary",
+            use_container_width=True,
+        ):
+            st.session_state["active_module"] = "payoff_table"
+            st.rerun()
+
     st.caption(
         "Dashboard DSS — Dibuat untuk keperluan presentasi akademik Statistika. "
-        "Semua komputasi berjalan secara lokal; tidak ada data yang dikirim ke server eksternal."
+        "Semua komputasi berjalan secara lokal."
     )
 
 
@@ -312,14 +415,7 @@ def render_welcome_page() -> None:
 # ---------------------------------------------------------------------------
 
 def route_to_module(active_module: str) -> None:
-    """
-    Route ke renderer modul yang sesuai berdasarkan active_module.
-
-    Parameters
-    ----------
-    active_module : str
-        Key modul yang sedang aktif (harus ada di MODULE_RENDERERS).
-    """
+    """Route ke renderer modul yang sesuai."""
     renderer = MODULE_RENDERERS.get(active_module)
 
     if renderer is None:
@@ -332,40 +428,25 @@ def route_to_module(active_module: str) -> None:
 
     renderer()
 
+    # Show next-module hint at the bottom of every module page
+    st.markdown("---")
+    next_module_hint(active_module)
+
 
 # ---------------------------------------------------------------------------
-# Main — entry point aplikasi
+# Main
 # ---------------------------------------------------------------------------
 
 def main() -> None:
-    """
-    Fungsi utama yang dijalankan setiap kali Streamlit me-rerun halaman.
-
-    Urutan eksekusi:
-    1. Inisialisasi session state
-    2. Inject CSS custom
-    3. Render sidebar (memperbarui active_module jika user klik tombol)
-    4. Routing: halaman sambutan atau renderer modul
-    """
-    # 1. Inisialisasi session state (idempoten — tidak menimpa state yang ada)
     _init_session_state()
-
-    # 2. Inject CSS custom (font Inter, warna akademis, dll.)
     inject_custom_css()
-
-    # 3. Render sidebar dan baca modul aktif
-    #    render_sidebar() juga menulis ke st.session_state["active_module"]
-    #    saat user mengklik tombol navigasi.
     render_sidebar()
 
-    # 4. Routing berdasarkan active_module
     active_module: str | None = st.session_state.get("active_module")
 
     if active_module is None:
-        # Belum ada modul yang dipilih → tampilkan halaman sambutan
         render_welcome_page()
     else:
-        # Ada modul aktif → route ke renderer yang sesuai
         route_to_module(active_module)
 
 

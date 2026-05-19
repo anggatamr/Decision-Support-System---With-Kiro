@@ -540,6 +540,27 @@ def render_uncertainty_module() -> None:
             )
 
     # ------------------------------------------------------------------
+    # Download hasil kriteria ketidakpastian
+    # ------------------------------------------------------------------
+    st.markdown("---")
+    st.subheader("📥 Unduh Hasil")
+    import pandas as _pd_dl
+    dl_df = _pd_dl.DataFrame({
+        "Alternatif": alt_names,
+        "Maximax (Maks Payoff)": payoff_matrix.max(axis=1).tolist(),
+        "Maximin (Min Payoff)": payoff_matrix.min(axis=1).tolist(),
+        "Minimax Regret (Maks Regret)": regret_matrix.max(axis=1).tolist(),
+        "Laplace (Rata-rata)": laplace_scores.tolist(),
+    })
+    csv_bytes = dl_df.to_csv(index=False).encode("utf-8")
+    st.download_button(
+        label="📥 Unduh Hasil Kriteria Ketidakpastian (CSV)",
+        data=csv_bytes,
+        file_name="uncertainty_results.csv",
+        mime="text/csv",
+    )
+
+    # ------------------------------------------------------------------
     # Deskripsi metodologi (Req 5.12)
     # ------------------------------------------------------------------
     st.markdown("---")

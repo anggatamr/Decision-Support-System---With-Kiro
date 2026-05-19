@@ -470,6 +470,28 @@ def render_ev_eol_module() -> None:
             )
 
     # ------------------------------------------------------------------
+    # Download hasil EV & EOL
+    # ------------------------------------------------------------------
+    st.markdown("---")
+    st.subheader("📥 Unduh Hasil")
+
+    import io as _io
+    combined_df = pd.DataFrame({
+        "Alternatif": alt_names,
+        "EV": [f"{v:.4f}" for v in ev_values],
+        "EOL": [f"{v:.4f}" for v in eol_values],
+        "Optimal EV": ["✅" if i in best_ev_idx else "" for i in range(len(alt_names))],
+        "Optimal EOL": ["✅" if i in best_eol_idx else "" for i in range(len(alt_names))],
+    })
+    csv_bytes = combined_df.to_csv(index=False).encode("utf-8")
+    st.download_button(
+        label="📥 Unduh Hasil EV & EOL (CSV)",
+        data=csv_bytes,
+        file_name="ev_eol_results.csv",
+        mime="text/csv",
+    )
+
+    # ------------------------------------------------------------------
     # Deskripsi metodologi (Req 4.11)
     # ------------------------------------------------------------------
     st.markdown("---")

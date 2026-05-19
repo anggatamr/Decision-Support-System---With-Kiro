@@ -765,6 +765,29 @@ def render_monte_carlo_module() -> None:
         st.session_state["completed_modules"].add("monte_carlo")
 
     # -----------------------------------------------------------------------
+    # Download hasil simulasi
+    # -----------------------------------------------------------------------
+    if run_result is not None:
+        st.markdown("---")
+        st.subheader("📥 Unduh Hasil Simulasi")
+        import pandas as _pd_dl
+        dl_stats_df = _pd_dl.DataFrame([
+            {"Statistik": "Mean",          "Nilai": fmt_stat(stats['mean'])},
+            {"Statistik": "Std Dev",       "Nilai": fmt_stat(stats['std'])},
+            {"Statistik": "P5",            "Nilai": fmt_stat(stats['p5'])},
+            {"Statistik": "P95",           "Nilai": fmt_stat(stats['p95'])},
+            {"Statistik": "Min",           "Nilai": fmt_stat(stats['min'])},
+            {"Statistik": "Max",           "Nilai": fmt_stat(stats['max'])},
+        ])
+        csv_bytes = dl_stats_df.to_csv(index=False).encode("utf-8")
+        st.download_button(
+            label="📥 Unduh Statistik Simulasi (CSV)",
+            data=csv_bytes,
+            file_name="monte_carlo_stats.csv",
+            mime="text/csv",
+        )
+
+    # -----------------------------------------------------------------------
     # Deskripsi metodologi (Req 8.14) — selalu ditampilkan
     # -----------------------------------------------------------------------
     st.markdown("---")

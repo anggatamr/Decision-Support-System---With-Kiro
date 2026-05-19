@@ -468,3 +468,16 @@ Dalam analisis di bawah kondisi **kepastian** (*certainty*):
         "✅ **Payoff Table telah tersimpan.** Data ini akan digunakan secara otomatis "
         "oleh modul **EV & EOL**, **Kriteria Keputusan**, dan **Fungsi Utilitas**."
     )
+
+    # ------------------------------------------------------------------
+    # Download payoff table
+    # ------------------------------------------------------------------
+    st.markdown("---")
+    st.subheader("📥 Unduh Payoff Table")
+    csv_bytes = df_payoff.to_csv().encode("utf-8")
+    st.download_button(
+        label="📥 Unduh Payoff Table (CSV)",
+        data=csv_bytes,
+        file_name="payoff_table.csv",
+        mime="text/csv",
+    )

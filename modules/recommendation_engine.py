@@ -226,21 +226,39 @@ def _render_export_button(
     consensus_pct: float,
 ) -> None:
     """
-    Render tombol 'Ekspor Laporan' yang menghasilkan teks yang dapat disalin.
+    Render tombol ekspor laporan — teks yang dapat disalin + unduhan CSV.
     Req 9.7
     """
     import streamlit as st
+    import pandas as pd
     from utils.recommendation import generate_report_text
 
     st.markdown("---")
     st.subheader("📄 Ekspor Laporan")
 
-    if st.button("📋 Ekspor Laporan", type="primary", key="btn_export_report"):
-        report_text = generate_report_text(results, consensus_alts, consensus_pct)
-        st.code(report_text, language=None)
-        st.caption(
-            "💡 Klik ikon salin (🗐) di pojok kanan atas kotak teks di atas "
-            "untuk menyalin laporan ke clipboard."
+    col_txt, col_csv = st.columns(2)
+
+    with col_txt:
+        if st.button("📋 Tampilkan Laporan Teks", type="primary", key="btn_export_report"):
+            report_text = generate_report_text(results, consensus_alts, consensus_pct)
+            st.code(report_text, language=None)
+            st.caption(
+                "💡 Klik ikon salin (🗐) di pojok kanan atas untuk menyalin ke clipboard."
+            )
+
+    with col_csv:
+        # Always-visible CSV download button
+        rows = [{"Metode": m, "Alternatif Terbaik": a} for m, a in results.items()]
+        if consensus_alts:
+            rows.append({"Metode": "KONSENSUS", "Alternatif Terbaik": ", ".join(consensus_alts)})
+            rows.append({"Metode": "Tingkat Konsensus", "Alternatif Terbaik": f"{consensus_pct:.1f}%"})
+        csv_bytes = pd.DataFrame(rows).to_csv(index=False).encode("utf-8")
+        st.download_button(
+            label="📥 Unduh Laporan (CSV)",
+            data=csv_bytes,
+            file_name="dss_recommendation_report.csv",
+            mime="text/csv",
+            use_container_width=True,
         )
 
 
