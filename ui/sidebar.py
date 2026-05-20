@@ -1,6 +1,6 @@
 """
-ui/sidebar.py — Sidebar navigation for DSS Dashboard.
-Clean dark sidebar with full-text nav buttons and progress bar.
+ui/sidebar.py — Pure Streamlit sidebar. No HTML injection.
+Uses st.markdown for text and st.button for nav — reliable on Streamlit Cloud.
 """
 
 from __future__ import annotations
@@ -29,90 +29,79 @@ def render_sidebar() -> str | None:
 
     completed: set[str] = st.session_state["completed_modules"]
     n_done = len(completed)
-    total = len(MODULES)
-    pct = int(n_done / total * 100)
+    total  = len(MODULES)
+    pct    = int(n_done / total * 100)
 
     with st.sidebar:
-        # ── Branding ──────────────────────────────────────────
+        # Branding — pure HTML, explicit white
         st.markdown(
-            """
-            <div style="text-align:center; padding:1.2rem 0 0.8rem;">
-                <div style="font-size:2rem; margin-bottom:0.4rem;">📊</div>
-                <p style="font-size:1.05rem; font-weight:800; color:#FFFFFF;
-                          margin:0; font-family:'Inter',sans-serif;">
-                    Dashboard DSS
-                </p>
-                <p style="font-size:0.72rem; color:rgba(255,255,255,0.5);
-                          margin:0.2rem 0 0; font-family:'Inter',sans-serif;">
-                    Decision Support System
-                </p>
-            </div>
-            """,
+            f"""<div style="text-align:center;padding:1rem 0 0.6rem;">
+                <p style="font-size:1.1rem;font-weight:800;color:#FFFFFF;margin:0;
+                          font-family:'Inter',sans-serif;">📊 Dashboard DSS</p>
+                <p style="font-size:0.72rem;color:rgba(255,255,255,0.55);margin:0.1rem 0 0;
+                          font-family:'Inter',sans-serif;">Decision Support System</p>
+            </div>""",
             unsafe_allow_html=True,
         )
 
         st.markdown(
-            "<hr style='border:none;border-top:1px solid rgba(255,255,255,0.12);margin:0 0 0.8rem;'>",
+            "<hr style='border:none;border-top:1px solid rgba(255,255,255,0.15);margin:0.4rem 0 0.7rem;'>",
             unsafe_allow_html=True,
         )
 
-        # ── Progress bar ──────────────────────────────────────
+        # Progress bar — pure HTML
         st.markdown(
-            f"""
-            <div style="padding:0 0.1rem; margin-bottom:0.9rem;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;">
-                    <span style="font-size:0.68rem; font-weight:700; color:rgba(255,255,255,0.55);
-                                 text-transform:uppercase; letter-spacing:0.7px;
+            f"""<div style="margin-bottom:0.8rem;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:0.35rem;">
+                    <span style="font-size:0.68rem;font-weight:700;color:rgba(255,255,255,0.55);
+                                 text-transform:uppercase;letter-spacing:0.6px;
                                  font-family:'Inter',sans-serif;">Progress</span>
-                    <span style="font-size:0.72rem; font-weight:600; color:rgba(255,255,255,0.8);
-                                 font-family:'Inter',sans-serif;">{n_done}/{total} modul</span>
+                    <span style="font-size:0.72rem;font-weight:600;color:rgba(255,255,255,0.80);
+                                 font-family:'Inter',sans-serif;">{n_done}/{total}</span>
                 </div>
-                <div style="background:rgba(255,255,255,0.12); border-radius:6px; height:7px; overflow:hidden;">
-                    <div style="background:linear-gradient(90deg,#2563EB,#0EA5E9);
-                                width:{pct}%; height:100%; border-radius:6px;
-                                min-width:{'6px' if n_done>0 else '0'};"></div>
+                <div style="background:rgba(255,255,255,0.15);border-radius:6px;height:7px;overflow:hidden;">
+                    <div style="background:linear-gradient(90deg,#3B82F6,#06B6D4);
+                                width:{pct}%;height:100%;border-radius:6px;
+                                min-width:{'6px' if n_done > 0 else '0'};"></div>
                 </div>
-            </div>
-            """,
+            </div>""",
             unsafe_allow_html=True,
         )
 
         st.markdown(
-            "<hr style='border:none;border-top:1px solid rgba(255,255,255,0.12);margin:0 0 0.6rem;'>",
+            "<hr style='border:none;border-top:1px solid rgba(255,255,255,0.15);margin:0.4rem 0 0.5rem;'>",
             unsafe_allow_html=True,
         )
 
-        # ── Nav label ─────────────────────────────────────────
         st.markdown(
-            "<p style='font-size:0.68rem; font-weight:700; color:rgba(255,255,255,0.5);"
-            "text-transform:uppercase; letter-spacing:0.7px; margin:0 0 0.5rem;"
+            "<p style='font-size:0.68rem;font-weight:700;color:rgba(255,255,255,0.50);"
+            "text-transform:uppercase;letter-spacing:0.6px;margin:0 0 0.4rem;"
             "font-family:\"Inter\",sans-serif;'>Navigasi Modul</p>",
             unsafe_allow_html=True,
         )
 
-        # ── Nav buttons ───────────────────────────────────────
+        # Nav buttons
         for key, label in MODULES:
-            is_active = st.session_state["active_module"] == key
-            is_done   = key in completed
+            is_active    = st.session_state["active_module"] == key
+            is_done      = key in completed
             needs_payoff = key in _REQUIRES_PAYOFF
-            payoff_missing = needs_payoff and "payoff_table" not in completed
+            payoff_miss  = needs_payoff and "payoff_table" not in completed
 
-            dot = "🟢" if is_done else "⚪"
+            dot     = "🟢" if is_done else "⚪"
             display = f"{dot} {label}"
-            btn_type = "primary" if is_active else "secondary"
+            btype   = "primary" if is_active else "secondary"
 
             if st.button(
                 display,
                 key=f"nav_{key}",
                 use_container_width=True,
-                type=btn_type,
-                help="Selesaikan Payoff Table dulu" if payoff_missing else None,
+                type=btype,
+                help="Selesaikan Payoff Table dulu" if payoff_miss else None,
             ):
                 st.session_state["active_module"] = key
 
-        # ── Divider + Home ────────────────────────────────────
         st.markdown(
-            "<hr style='border:none;border-top:1px solid rgba(255,255,255,0.12);margin:0.6rem 0;'>",
+            "<hr style='border:none;border-top:1px solid rgba(255,255,255,0.15);margin:0.5rem 0;'>",
             unsafe_allow_html=True,
         )
 
@@ -120,10 +109,9 @@ def render_sidebar() -> str | None:
                      use_container_width=True, type="secondary"):
             st.session_state["active_module"] = None
 
-        # ── Footer ────────────────────────────────────────────
         st.markdown(
-            "<p style='text-align:center; font-size:0.65rem; color:rgba(255,255,255,0.3);"
-            "margin:0.8rem 0 0; font-family:\"Inter\",sans-serif;'>"
+            "<p style='text-align:center;font-size:0.63rem;color:rgba(255,255,255,0.28);"
+            "margin:0.6rem 0 0;font-family:\"Inter\",sans-serif;'>"
             "8 modul · 279 tests · Built with Kiro</p>",
             unsafe_allow_html=True,
         )

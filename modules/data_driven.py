@@ -256,7 +256,7 @@ def render_data_driven_module() -> None:
     col3.metric("Nama File", uploaded_file.name)
 
     # Tabel tipe data kolom
-    with st.expander("📋 Tipe Data Setiap Kolom", expanded=False):
+    with st.expander("Tipe Data Setiap Kolom", expanded=False):
         dtype_df = pd.DataFrame(
             {"Kolom": list(info["dtypes"].keys()), "Tipe Data": list(info["dtypes"].values())}
         )
