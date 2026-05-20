@@ -106,11 +106,6 @@ MODULE_RENDERERS: dict[str, callable] = {
 # ---------------------------------------------------------------------------
 
 def _init_session_state() -> None:
-    """
-    Inisialisasi semua key st.session_state dengan nilai default.
-    Hanya mengisi key yang belum ada agar state yang sudah tersimpan
-    tidak tertimpa saat halaman di-rerun (Requirement 1.8).
-    """
     defaults: dict = {
         "df":                   None,
         "df_filename":          None,
@@ -130,59 +125,120 @@ def _init_session_state() -> None:
         "active_module":        None,
         "completed_modules":    set(),
     }
-
     for key, default_value in defaults.items():
         if key not in st.session_state:
             st.session_state[key] = default_value
 
 
 # ---------------------------------------------------------------------------
-# Welcome page — enhanced with feature cards and quick-start
+# Welcome page — optimized for presentation
 # ---------------------------------------------------------------------------
 
 def render_welcome_page() -> None:
-    """
-    Render halaman sambutan dengan feature cards, quick-start guide,
-    dan statistik aplikasi.
-    """
+    """Render halaman sambutan yang optimal untuk presentasi."""
 
     # ------------------------------------------------------------------
-    # Hero section
+    # Hero section — gradient lebih kontras dan informatif
     # ------------------------------------------------------------------
     st.markdown(
         f"""
         <div style="
-            background: linear-gradient(135deg, {COLORS['primary']} 0%, #0d2d45 100%);
-            border-radius: 16px;
-            padding: 2.5rem 2rem;
-            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, {COLORS['primary']} 0%, #082040 55%, #0d2d4a 100%);
+            border-radius: 18px;
+            padding: 2.8rem 2.4rem;
+            margin-bottom: 1.8rem;
             color: white;
+            border: 1px solid rgba(36,113,163,0.3);
+            box-shadow: 0 8px 32px rgba(15,52,96,0.25);
+            position: relative;
+            overflow: hidden;
         ">
-            <p style="font-size: 2.4rem; font-weight: 800; margin: 0; line-height: 1.2;
-                      letter-spacing: -1px;">
-                📊 Dashboard DSS
-            </p>
-            <p style="font-size: 1.1rem; color: rgba(255,255,255,0.8);
-                      margin: 0.5rem 0 1rem 0; font-weight: 400;">
-                Decision Support System — Platform Analisis Keputusan Akademik
-            </p>
-            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                <span style="background: rgba(255,255,255,0.15); border-radius: 20px;
-                             padding: 0.3rem 0.9rem; font-size: 0.82rem; font-weight: 600;">
-                    🧮 8 Modul Analisis
-                </span>
-                <span style="background: rgba(255,255,255,0.15); border-radius: 20px;
-                             padding: 0.3rem 0.9rem; font-size: 0.82rem; font-weight: 600;">
-                    ✅ 279 Property Tests
-                </span>
-                <span style="background: rgba(255,255,255,0.15); border-radius: 20px;
-                             padding: 0.3rem 0.9rem; font-size: 0.82rem; font-weight: 600;">
-                    🐍 Python + Streamlit
-                </span>
-                <span style="background: rgba(255,255,255,0.15); border-radius: 20px;
-                             padding: 0.3rem 0.9rem; font-size: 0.82rem; font-weight: 600;">
-                    📐 LaTeX Formulas
-                </span>
+            <div style="
+                position: absolute;
+                top: -40px; right: -40px;
+                width: 200px; height: 200px;
+                background: radial-gradient(circle, rgba(36,113,163,0.25) 0%, transparent 70%);
+                border-radius: 50%;
+            "></div>
+            <div style="
+                position: absolute;
+                bottom: -30px; left: 60%;
+                width: 150px; height: 150px;
+                background: radial-gradient(circle, rgba(26,188,156,0.15) 0%, transparent 70%);
+                border-radius: 50%;
+            "></div>
+            <div style="position: relative; z-index: 1;">
+                <p style="
+                    font-size: 0.8rem;
+                    color: rgba(255,255,255,0.55);
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 1.5px;
+                    margin: 0 0 0.5rem 0;
+                    font-family: 'DM Sans', sans-serif;
+                ">Sistem Pendukung Keputusan Akademik</p>
+                <p style="
+                    font-size: 2.6rem;
+                    font-weight: 800;
+                    margin: 0 0 0.4rem 0;
+                    line-height: 1.1;
+                    letter-spacing: -1px;
+                    font-family: 'DM Sans', sans-serif;
+                    color: #FFFFFF;
+                ">📊 Dashboard DSS</p>
+                <p style="
+                    font-size: 1.05rem;
+                    color: rgba(255,255,255,0.72);
+                    margin: 0 0 1.4rem 0;
+                    font-weight: 400;
+                    font-family: 'DM Sans', sans-serif;
+                ">Platform analisis keputusan kuantitatif terintegrasi — dari Data-Driven hingga Model-Driven DSS</p>
+                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                    <span style="
+                        background: rgba(255,255,255,0.12);
+                        backdrop-filter: blur(10px);
+                        border: 1px solid rgba(255,255,255,0.2);
+                        border-radius: 20px;
+                        padding: 0.3rem 0.9rem;
+                        font-size: 0.8rem;
+                        font-weight: 600;
+                        color: #FFFFFF;
+                        font-family: 'DM Sans', sans-serif;
+                    ">🧮 8 Modul Analisis</span>
+                    <span style="
+                        background: rgba(255,255,255,0.12);
+                        backdrop-filter: blur(10px);
+                        border: 1px solid rgba(255,255,255,0.2);
+                        border-radius: 20px;
+                        padding: 0.3rem 0.9rem;
+                        font-size: 0.8rem;
+                        font-weight: 600;
+                        color: #FFFFFF;
+                        font-family: 'DM Sans', sans-serif;
+                    ">✅ 279 Property Tests</span>
+                    <span style="
+                        background: rgba(255,255,255,0.12);
+                        backdrop-filter: blur(10px);
+                        border: 1px solid rgba(255,255,255,0.2);
+                        border-radius: 20px;
+                        padding: 0.3rem 0.9rem;
+                        font-size: 0.8rem;
+                        font-weight: 600;
+                        color: #FFFFFF;
+                        font-family: 'DM Sans', sans-serif;
+                    ">🐍 Python + Streamlit</span>
+                    <span style="
+                        background: rgba(255,255,255,0.12);
+                        backdrop-filter: blur(10px);
+                        border: 1px solid rgba(255,255,255,0.2);
+                        border-radius: 20px;
+                        padding: 0.3rem 0.9rem;
+                        font-size: 0.8rem;
+                        font-weight: 600;
+                        color: #FFFFFF;
+                        font-family: 'DM Sans', sans-serif;
+                    ">📐 Hypothesis Testing</span>
+                </div>
             </div>
         </div>
         """,
@@ -190,7 +246,7 @@ def render_welcome_page() -> None:
     )
 
     # ------------------------------------------------------------------
-    # Quick stats row
+    # Stats row
     # ------------------------------------------------------------------
     c1, c2, c3, c4 = st.columns(4)
     with c1:
@@ -232,27 +288,44 @@ def render_welcome_page() -> None:
     with col_right:
         st.subheader("🗺️ Peta Modul")
         module_info = [
-            ("📊", "Data-Driven DSS",       "Upload & eksplorasi dataset"),
-            ("📋", "Payoff Table",           "Definisi alternatif & payoff"),
-            ("🎲", "EV & EOL",              "Expected Value & Opportunity Loss"),
-            ("❓", "Uncertainty",            "Maximax, Maximin, Laplace"),
-            ("📈", "Distribusi",             "MLE + PDF/PMF interaktif"),
-            ("⚖️", "Fungsi Utilitas",        "Curve fitting & risk preference"),
-            ("🎰", "Monte Carlo",            "Simulasi stokastik + sensitivity"),
-            ("🏆", "Recommendation",         "Konsensus lintas metode"),
+            ("📊", "Data-Driven DSS",      "Upload & eksplorasi dataset"),
+            ("📋", "Payoff Table",          "Definisi alternatif & payoff"),
+            ("🎲", "EV & EOL",             "Expected Value & Opportunity Loss"),
+            ("❓", "Uncertainty",           "Maximax, Maximin, Laplace"),
+            ("📈", "Distribusi",            "MLE + PDF/PMF interaktif"),
+            ("⚖️", "Fungsi Utilitas",       "Curve fitting & risk preference"),
+            ("🎰", "Monte Carlo",           "Simulasi stokastik + sensitivity"),
+            ("🏆", "Recommendation",        "Konsensus lintas metode"),
         ]
         for icon, name, desc in module_info:
             st.markdown(
                 f"""
-                <div style="display: flex; align-items: center; gap: 0.7rem;
-                            padding: 0.45rem 0.7rem; border-radius: 8px;
-                            margin-bottom: 4px; background: white;
-                            border: 1px solid {COLORS['border']};">
-                    <span style="font-size: 1.1rem;">{icon}</span>
+                <div style="
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                    padding: 0.5rem 0.85rem;
+                    border-radius: 9px;
+                    margin-bottom: 5px;
+                    background: #FFFFFF;
+                    border: 1px solid {COLORS['border']};
+                    transition: border-color 0.2s;
+                ">
+                    <span style="font-size: 1.05rem;">{icon}</span>
                     <div>
-                        <p style="margin: 0; font-weight: 600; font-size: 0.88rem;
-                                  color: {COLORS['primary']};">{name}</p>
-                        <p style="margin: 0; font-size: 0.75rem; color: #7f8c8d;">{desc}</p>
+                        <p style="
+                            margin: 0;
+                            font-weight: 700;
+                            font-size: 0.87rem;
+                            color: {COLORS['primary']};
+                            font-family: 'DM Sans', sans-serif;
+                        ">{name}</p>
+                        <p style="
+                            margin: 0;
+                            font-size: 0.74rem;
+                            color: {COLORS['mid_gray']};
+                            font-family: 'DM Sans', sans-serif;
+                        ">{desc}</p>
                     </div>
                 </div>
                 """,
@@ -268,98 +341,95 @@ def render_welcome_page() -> None:
 
     fc1, fc2, fc3 = st.columns(3)
 
-    with fc1:
-        st.markdown(
-            f"""
-            <div class="dss-card dss-card-accent">
-                <p style="font-size: 1.5rem; margin: 0 0 0.5rem 0;">📐</p>
-                <p style="font-weight: 700; color: {COLORS['primary']};
-                          margin: 0 0 0.3rem 0;">Rumus LaTeX</p>
-                <p style="color: #5a7a8a; font-size: 0.85rem; margin: 0;">
-                    Setiap metode dilengkapi rumus matematis yang dirender
-                    via <code>st.latex()</code> — tampil profesional untuk presentasi akademik.
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+    feature_cards = [
+        (fc1, "📐", "Rumus LaTeX", COLORS["accent"],
+         "Setiap metode dilengkapi rumus matematis yang dirender via <code>st.latex()</code> — tampil profesional untuk presentasi akademik."),
+        (fc2, "📊", "Visualisasi Interaktif", COLORS["success"],
+         "Semua chart menggunakan Plotly dengan template <code>plotly_white</code>, judul, label sumbu, dan legenda yang konsisten."),
+        (fc3, "🔬", "Property-Based Testing", COLORS["warning"],
+         "279 property tests via Hypothesis memverifikasi kebenaran matematis setiap fungsi komputasi secara formal."),
+    ]
 
-    with fc2:
-        st.markdown(
-            f"""
-            <div class="dss-card dss-card-success">
-                <p style="font-size: 1.5rem; margin: 0 0 0.5rem 0;">📊</p>
-                <p style="font-weight: 700; color: {COLORS['primary']};
-                          margin: 0 0 0.3rem 0;">Visualisasi Interaktif</p>
-                <p style="color: #5a7a8a; font-size: 0.85rem; margin: 0;">
-                    Semua chart menggunakan Plotly dengan template <code>plotly_white</code>,
-                    judul, label sumbu, dan legenda yang konsisten.
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    with fc3:
-        st.markdown(
-            f"""
-            <div class="dss-card dss-card-warning">
-                <p style="font-size: 1.5rem; margin: 0 0 0.5rem 0;">🔬</p>
-                <p style="font-weight: 700; color: {COLORS['primary']};
-                          margin: 0 0 0.3rem 0;">Property-Based Testing</p>
-                <p style="color: #5a7a8a; font-size: 0.85rem; margin: 0;">
-                    279 property tests via Hypothesis memverifikasi kebenaran
-                    matematis setiap fungsi komputasi secara formal.
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+    for col, icon, title, accent, desc in feature_cards:
+        with col:
+            st.markdown(
+                f"""
+                <div style="
+                    background: #FFFFFF;
+                    border-radius: 14px;
+                    padding: 1.4rem 1.3rem;
+                    border: 1px solid {COLORS['border']};
+                    border-top: 4px solid {accent};
+                    box-shadow: 0 2px 12px rgba(15,52,96,0.07);
+                    height: 100%;
+                ">
+                    <p style="font-size: 1.6rem; margin: 0 0 0.6rem 0;">{icon}</p>
+                    <p style="
+                        font-weight: 700;
+                        color: {COLORS['primary']};
+                        margin: 0 0 0.4rem 0;
+                        font-family: 'DM Sans', sans-serif;
+                        font-size: 0.98rem;
+                    ">{title}</p>
+                    <p style="
+                        color: {COLORS['body_text']};
+                        font-size: 0.84rem;
+                        margin: 0;
+                        line-height: 1.6;
+                        font-family: 'DM Sans', sans-serif;
+                    ">{desc}</p>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
     st.markdown("---")
 
     # ------------------------------------------------------------------
-    # Quick-start guide — numbered steps
+    # Quick-start guide — alur presentasi yang disarankan
     # ------------------------------------------------------------------
-    st.subheader("🚀 Cara Memulai")
+    st.subheader("🚀 Alur Penggunaan yang Disarankan")
 
     steps = [
         ("1", "📋", "Buat Payoff Table",
-         "Mulai dari modul **Certainty — Payoff Table**. Definisikan alternatif keputusan, "
-         "kondisi alam, dan isi nilai payoff. Tabel ini menjadi fondasi untuk modul EV & EOL, "
-         "Uncertainty, dan Utility."),
+         "**payoff_table",
+         "Mulai dari modul **Certainty — Payoff Table**. Definisikan alternatif keputusan, kondisi alam, dan isi nilai payoff. Tabel ini menjadi fondasi untuk modul EV & EOL, Uncertainty, dan Utility."),
         ("2", "🎲", "Jalankan Analisis Risiko",
-         "Buka **Risk — EV & EOL**, masukkan probabilitas kondisi alam, dan hitung "
-         "Expected Value, Expected Opportunity Loss, serta EVPI."),
+         "ev_eol",
+         "Buka **Risk — EV & EOL**, masukkan probabilitas kondisi alam, dan hitung Expected Value, Expected Opportunity Loss, serta EVPI."),
         ("3", "❓", "Bandingkan Kriteria Ketidakpastian",
-         "Di modul **Uncertainty**, bandingkan empat kriteria (Maximax, Maximin, "
-         "Minimax Regret, Laplace) tanpa memerlukan informasi probabilitas."),
+         "uncertainty",
+         "Di modul **Uncertainty**, bandingkan empat kriteria (Maximax, Maximin, Minimax Regret, Laplace) tanpa informasi probabilitas."),
         ("4", "🏆", "Lihat Rekomendasi Konsensus",
-         "Setelah ≥2 modul dijalankan, **Recommendation Engine** merangkum alternatif "
-         "terbaik dari semua metode dan menampilkan tingkat konsensus."),
+         "recommendation",
+         "Setelah ≥2 modul dijalankan, **Recommendation Engine** merangkum alternatif terbaik dari semua metode dan menampilkan tingkat konsensus."),
     ]
 
-    for num, icon, title, desc in steps:
+    for num, icon, title, module_key, desc in steps:
         col_num, col_content = st.columns([1, 11])
         with col_num:
             st.markdown(
                 f"""
                 <div style="
-                    background: {COLORS['accent']};
+                    background: linear-gradient(135deg, {COLORS['accent']} 0%, {COLORS['primary']} 100%);
                     color: white;
                     border-radius: 50%;
-                    width: 36px; height: 36px;
+                    width: 38px; height: 38px;
                     display: flex; align-items: center; justify-content: center;
                     font-weight: 800; font-size: 1rem;
                     margin-top: 0.2rem;
+                    box-shadow: 0 3px 10px rgba(36,113,163,0.35);
+                    font-family: 'DM Sans', sans-serif;
                 ">{num}</div>
                 """,
                 unsafe_allow_html=True,
             )
         with col_content:
             st.markdown(f"**{icon} {title}**")
-            st.markdown(f"<p style='color: #5a7a8a; font-size: 0.88rem; margin: 0;'>{desc}</p>",
-                        unsafe_allow_html=True)
+            st.markdown(
+                f"<p style='color: {COLORS['body_text']}; font-size: 0.88rem; margin: 0; line-height: 1.6;'>{desc}</p>",
+                unsafe_allow_html=True,
+            )
         st.markdown("")
 
     st.markdown("---")
@@ -391,10 +461,10 @@ def render_welcome_page() -> None:
         )
 
     # ------------------------------------------------------------------
-    # CTA button
+    # CTA button — mulai presentasi
     # ------------------------------------------------------------------
     st.markdown("---")
-    col_cta, _ = st.columns([2, 3])
+    col_cta, col_data, _ = st.columns([2, 2, 3])
     with col_cta:
         if st.button(
             "🚀 Mulai — Buat Payoff Table",
@@ -403,10 +473,18 @@ def render_welcome_page() -> None:
         ):
             st.session_state["active_module"] = "payoff_table"
             st.rerun()
+    with col_data:
+        if st.button(
+            "📊 Eksplorasi Data Terlebih Dulu",
+            type="secondary",
+            use_container_width=True,
+        ):
+            st.session_state["active_module"] = "data_driven"
+            st.rerun()
 
     st.caption(
         "Dashboard DSS — Dibuat untuk keperluan presentasi akademik Statistika. "
-        "Semua komputasi berjalan secara lokal."
+        "Semua komputasi berjalan secara lokal · Session state otomatis tersimpan."
     )
 
 

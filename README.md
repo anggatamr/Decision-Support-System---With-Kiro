@@ -1,6 +1,6 @@
 # Dashboard DSS — Decision Support System
 
-> A modular, academically-oriented Decision Support System built with Python and Streamlit. Designed for Statistics students to present quantitative decision analysis methods in a clean, interactive interface — complete with LaTeX-rendered formulas, Plotly visualizations, and a property-based test suite.
+> A modular, academically-oriented Decision Support System built with Python and Streamlit. Designed for Statistics students to present quantitative decision analysis methods in a clean, interactive interface — complete with LaTeX-rendered formulas, Plotly visualizations, a property-based test suite, and a polished presentation-ready UI.
 
 ---
 
@@ -20,13 +20,13 @@ All computation is session-local. No database, no external API calls, no persist
 | # | Module | Method Group | Key Output |
 |---|--------|-------------|------------|
 | 1 | 📊 Data-Driven DSS | Descriptive Statistics | Dataset preview, trend charts, correlation heatmap |
-| 2 | 📋 Certainty — Payoff Table | Decision under Certainty | Payoff matrix with column-max highlights |
-| 3 | 🎲 Risk — EV & EOL | Decision under Risk | Expected Value, Expected Opportunity Loss, EVPI |
-| 4 | ❓ Uncertainty — Criteria | Decision under Uncertainty | Maximax, Maximin, Minimax Regret, Laplace |
+| 2 | 📋 Certainty — Payoff Table | Decision under Certainty | Payoff matrix with column-max highlights + CSV export |
+| 3 | 🎲 Risk — EV & EOL | Decision under Risk | Expected Value, Expected Opportunity Loss, EVPI + CSV export |
+| 4 | ❓ Uncertainty — Criteria | Decision under Uncertainty | Maximax, Maximin, Minimax Regret, Laplace + CSV export |
 | 5 | 📈 Probabilistic — Distribution | Probability Estimation | MLE parameter estimation, PDF/PMF, 95% CI via bootstrap |
 | 6 | ⚖️ Utility — Utility Function | Utility Theory | Curve fitting, Risk Preference classification, Expected Utility |
-| 7 | 🎰 Simulation — Monte Carlo | Stochastic Simulation | Output distribution, CDF, Spearman sensitivity tornado chart |
-| 8 | 🏆 Recommendation Engine | Consensus Analysis | Cross-method consensus, exportable report |
+| 7 | 🎰 Simulation — Monte Carlo | Stochastic Simulation | Output distribution, CDF, Spearman sensitivity tornado chart + CSV export |
+| 8 | 🏆 Recommendation Engine | Consensus Analysis | Cross-method consensus, text report + CSV export |
 
 ---
 
@@ -46,8 +46,10 @@ dss-dashboard-streamlit/
 │   ├── monte_carlo.py              # Module 7: Monte Carlo simulation + sensitivity
 │   └── recommendation_engine.py   # Module 8: consensus recommendation engine
 ├── ui/
-│   ├── styles.py                   # inject_custom_css(), COLORS palette
-│   └── sidebar.py                  # render_sidebar() → active module key
+│   ├── styles.py                   # inject_custom_css(), COLORS palette (presentation-optimized)
+│   ├── sidebar.py                  # render_sidebar() — progress bar, status dots, branding
+│   └── components.py               # Reusable components: dashboard_card, download buttons,
+│                                   #   next_module_hint, prerequisite_warning
 ├── utils/
 │   ├── validators.py               # Input validation (file, matrix, probabilities, distributions)
 │   ├── formatters.py               # Number formatters (monetary, probability, stat)
@@ -69,6 +71,35 @@ Each module follows a strict two-layer separation:
 
 - **Computation Layer** — pure Python functions with no Streamlit dependency. Accepts NumPy arrays / pandas DataFrames, returns numerical results. Fully testable in isolation.
 - **UI Layer** — `render_*()` functions that call the Streamlit API, read/write `st.session_state`, and render Plotly charts and LaTeX formulas.
+
+---
+
+## UI/UX Features
+
+### Sidebar
+- **Progress bar** showing X/8 modules complete
+- **🟢/⚪ status dots** per module (completed / not started)
+- Active module highlighted with primary button style
+- Dependency hints for modules requiring Payoff Table
+- App branding footer with tech stack info
+
+### Welcome Page
+- Dark hero banner with quick-stat badges
+- 4-column metrics row (modules, methods, tests, distributions)
+- Feature cards (LaTeX formulas, Plotly charts, property testing)
+- Numbered quick-start guide with CTA button
+- Module dependency map
+
+### Per-Module Enhancements
+- **Next-step hint card** at the bottom of every module page
+- **Download CSV buttons** on all result modules (Payoff Table, EV & EOL, Uncertainty, Monte Carlo, Recommendation Engine)
+- **Dual export** on Recommendation Engine: text report + CSV
+
+### Theming
+- Presentation-optimized color palette with high contrast
+- Fixed white-on-white issues in metric cards, dataframes, sidebar widgets
+- Smooth hover transitions on all interactive elements
+- `.dss-card` and `.dss-badge` CSS utility classes
 
 ---
 
@@ -158,7 +189,7 @@ The app opens at `http://localhost:8501`.
 
 8. **Review the Recommendation** — after running ≥2 modules, the Recommendation Engine aggregates results across all methods and reports the consensus alternative with a percentage agreement score.
 
-> **State persistence:** data entered in any module is preserved when navigating to another module within the same session. The sidebar shows a ✅ indicator next to completed modules.
+> **State persistence:** data entered in any module is preserved when navigating to another module within the same session. The sidebar shows a 🟢 indicator next to completed modules.
 
 ---
 

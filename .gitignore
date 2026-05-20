@@ -36,3 +36,7 @@ coverage.xml
 # OS
 .DS_Store
 Thumbs.db
+
+# Archives / build artifacts
+*.zip
+*.tar.gz
