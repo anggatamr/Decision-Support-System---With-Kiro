@@ -195,9 +195,9 @@ def render_ev_eol_module() -> None:
     # ------------------------------------------------------------------
     # Sidebar — input probabilitas kondisi alam (Req 4.1)
     # ------------------------------------------------------------------
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("### 🎲 Probabilitas Kondisi Alam")
-    st.sidebar.markdown(
+    st.markdown("---")
+    st.markdown("### 🎲 Probabilitas Kondisi Alam")
+    st.markdown(
         "Masukkan probabilitas untuk setiap kondisi alam. "
         "Total harus sama dengan **1.0** (toleransi ±0.001)."
     )
@@ -208,7 +208,7 @@ def render_ev_eol_module() -> None:
         prev_probs = st.session_state.get("probabilities")
         default_val = float(prev_probs[j]) if prev_probs is not None and len(prev_probs) == n else round(1.0 / n, 4)
 
-        p = st.sidebar.number_input(
+        p = st.number_input(
             label=f"P({state})",
             min_value=0.0,
             max_value=1.0,
@@ -222,9 +222,9 @@ def render_ev_eol_module() -> None:
     # Tampilkan total probabilitas di sidebar
     total_prob = sum(prob_inputs)
     if abs(total_prob - 1.0) <= 0.001:
-        st.sidebar.success(f"✅ Total probabilitas: **{total_prob:.4f}**")
+        st.success(f"✅ Total probabilitas: **{total_prob:.4f}**")
     else:
-        st.sidebar.error(f"❌ Total probabilitas: **{total_prob:.4f}** (harus = 1.0)")
+        st.error(f"❌ Total probabilitas: **{total_prob:.4f}** (harus = 1.0)")
 
     # ------------------------------------------------------------------
     # Validasi probabilitas (Req 4.1)

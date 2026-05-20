@@ -190,8 +190,8 @@ def render_data_driven_module() -> None:
     # ------------------------------------------------------------------
     # Sidebar — file uploader
     # ------------------------------------------------------------------
-    st.sidebar.markdown("### 📂 Unggah Dataset")
-    uploaded_file = st.sidebar.file_uploader(
+    st.markdown("### 📂 Unggah Dataset")
+    uploaded_file = st.file_uploader(
         "Pilih file CSV atau XLSX",
         type=["csv", "xlsx", "xls"],
         help="Ukuran maksimum: 50 MB",
@@ -294,7 +294,7 @@ def render_data_driven_module() -> None:
     else:
         # Sidebar — selector kolom (Req 2.6)
         default_col = get_default_numeric_column(df)
-        selected_col = st.sidebar.selectbox(
+        selected_col = st.selectbox(
             "Pilih kolom untuk divisualisasikan",
             options=numeric_cols,
             index=numeric_cols.index(default_col),
@@ -302,7 +302,7 @@ def render_data_driven_module() -> None:
         )
 
         # Sidebar — pilihan jenis chart
-        chart_type = st.sidebar.radio(
+        chart_type = st.radio(
             "Jenis chart",
             options=["Line Chart", "Bar Chart"],
             index=0,

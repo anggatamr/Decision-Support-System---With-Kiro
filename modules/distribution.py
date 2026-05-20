@@ -354,12 +354,12 @@ def _build_scipy_args(dist_type: str, params: dict) -> tuple:
 def _get_scipy_dist(dist_type: str):
     """Kembalikan objek scipy.stats untuk distribusi yang dipilih."""
     mapping = {
-        "Normal":      _scipy_stats.norm,
-        "Poisson":     _scipy_stats.poisson,
-        "Exponential": _scipy_stats.expon,
-        "Uniform":     _scipy_stats.uniform,
-        "Binomial":    _scipy_stats.binom,
-        "Beta":        _scipy_stats.beta,
+        "Normal":      stats.norm,
+        "Poisson":     stats.poisson,
+        "Exponential": stats.expon,
+        "Uniform":     stats.uniform,
+        "Binomial":    stats.binom,
+        "Beta":        stats.beta,
     }
     return mapping[dist_type]
 
@@ -428,10 +428,10 @@ def render_distribution_module() -> None:
     # ------------------------------------------------------------------
     # Sidebar — selector distribusi (Req 6.1)
     # ------------------------------------------------------------------
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("### 📈 Distribusi Probabilitas")
+    st.markdown("---")
+    st.markdown("### 📈 Distribusi Probabilitas")
 
-    dist_type: str = st.sidebar.selectbox(
+    dist_type: str = st.selectbox(
         "Pilih jenis distribusi",
         options=_DIST_OPTIONS,
         index=0,
@@ -442,7 +442,7 @@ def render_distribution_module() -> None:
     # ------------------------------------------------------------------
     # Sidebar — mode input (Req 6.2)
     # ------------------------------------------------------------------
-    input_mode: str = st.sidebar.radio(
+    input_mode: str = st.radio(
         "Mode input parameter",
         options=["Estimasi dari Data", "Input Manual"],
         index=0,
@@ -475,7 +475,7 @@ def render_distribution_module() -> None:
             return
 
         # Selector kolom numerik
-        selected_col: str = st.sidebar.selectbox(
+        selected_col: str = st.selectbox(
             "Pilih kolom data",
             options=numeric_cols,
             index=0,
@@ -493,7 +493,7 @@ def render_distribution_module() -> None:
 
         # Khusus Binomial — perlu n_trials dari user
         if dist_type == "Binomial":
-            n_trials_for_binomial = st.sidebar.number_input(
+            n_trials_for_binomial = st.number_input(
                 "Jumlah percobaan (n_trials)",
                 min_value=1,
                 max_value=10000,
@@ -528,21 +528,21 @@ def render_distribution_module() -> None:
             return
 
         # Tampilkan parameter estimasi di sidebar
-        st.sidebar.markdown("**Parameter MLE yang diestimasi:**")
+        st.markdown("**Parameter MLE yang diestimasi:**")
         for k, v in params.items():
-            st.sidebar.markdown(f"- **{k}** = {v:.6f}")
+            st.markdown(f"- **{k}** = {v:.6f}")
 
     else:
         # Mode Input Manual — tampilkan input per distribusi
-        st.sidebar.markdown("**Masukkan parameter distribusi:**")
+        st.markdown("**Masukkan parameter distribusi:**")
 
         if dist_type == "Normal":
-            mu = st.sidebar.number_input(
+            mu = st.number_input(
                 "μ (mu) — rata-rata",
                 value=0.0, step=0.1, format="%.4f",
                 key="dist_manual_mu",
             )
-            sigma = st.sidebar.number_input(
+            sigma = st.number_input(
                 "σ (sigma) — standar deviasi",
                 value=1.0, min_value=0.0001, step=0.1, format="%.4f",
                 key="dist_manual_sigma",
@@ -550,12 +550,12 @@ def render_distribution_module() -> None:
             params = {"mu": mu, "sigma": sigma}
 
         elif dist_type == "Binomial":
-            n_val = st.sidebar.number_input(
+            n_val = st.number_input(
                 "n — jumlah percobaan",
                 value=10, min_value=1, max_value=10000, step=1,
                 key="dist_manual_n",
             )
-            p_val = st.sidebar.number_input(
+            p_val = st.number_input(
                 "p — probabilitas keberhasilan",
                 value=0.5, min_value=0.0001, max_value=0.9999,
                 step=0.01, format="%.4f",
@@ -565,7 +565,7 @@ def render_distribution_module() -> None:
             n_trials_for_binomial = int(n_val)
 
         elif dist_type == "Poisson":
-            lam = st.sidebar.number_input(
+            lam = st.number_input(
                 "λ (lambda) — laju kejadian",
                 value=1.0, min_value=0.0001, step=0.1, format="%.4f",
                 key="dist_manual_lambda",
@@ -573,7 +573,7 @@ def render_distribution_module() -> None:
             params = {"lambda": lam}
 
         elif dist_type == "Exponential":
-            lam = st.sidebar.number_input(
+            lam = st.number_input(
                 "λ (lambda) — laju (rate)",
                 value=1.0, min_value=0.0001, step=0.1, format="%.4f",
                 key="dist_manual_lambda_exp",
@@ -581,12 +581,12 @@ def render_distribution_module() -> None:
             params = {"lambda": lam}
 
         elif dist_type == "Uniform":
-            a_val = st.sidebar.number_input(
+            a_val = st.number_input(
                 "a — batas bawah",
                 value=0.0, step=0.1, format="%.4f",
                 key="dist_manual_a",
             )
-            b_val = st.sidebar.number_input(
+            b_val = st.number_input(
                 "b — batas atas",
                 value=1.0, step=0.1, format="%.4f",
                 key="dist_manual_b",
@@ -594,12 +594,12 @@ def render_distribution_module() -> None:
             params = {"a": a_val, "b": b_val}
 
         elif dist_type == "Beta":
-            alpha_val = st.sidebar.number_input(
+            alpha_val = st.number_input(
                 "α (alpha) — parameter bentuk 1",
                 value=2.0, min_value=0.0001, step=0.1, format="%.4f",
                 key="dist_manual_alpha",
             )
-            beta_val = st.sidebar.number_input(
+            beta_val = st.number_input(
                 "β (beta) — parameter bentuk 2",
                 value=5.0, min_value=0.0001, step=0.1, format="%.4f",
                 key="dist_manual_beta",

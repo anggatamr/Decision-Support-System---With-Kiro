@@ -62,10 +62,13 @@ def inject_custom_css() -> None:
     /* ========================================================= */
     /* GLOBAL RESET — Paksa font dan warna teks yang konsisten   */
     /* ========================================================= */
-    html, body, [class*="css"], [class*="st-"], .stApp,
-    .stMarkdown, .stText, p, span, label, div {{
+    html, body, [class*="css"], [class*="st-"], .stApp {{
         font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
         color: {COLORS["dark_text"]};
+    }}
+    
+    .stMarkdown, .stText, p, span, label, div {{
+        font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
     }}
 
     /* ========================================================= */

@@ -102,11 +102,11 @@ def render_welcome_page() -> None:
     st.markdown(
         f"""
         <div style="
-            background: linear-gradient(135deg, {COLORS['primary']} 0%, #0F2347 100%);
-            border-radius: 16px;
+            background: {COLORS['accent2']};
+            border: 4px solid #000;
+            box-shadow: 8px 8px 0px #000;
             padding: 2.5rem 2.2rem;
             margin-bottom: 1.6rem;
-            border: 1px solid rgba(37,99,235,0.20);
         ">
             <p style="
                 font-size: 0.72rem;
@@ -120,7 +120,7 @@ def render_welcome_page() -> None:
             <p style="
                 font-size: 2.4rem;
                 font-weight: 800;
-                color: #FFFFFF;
+                color: #000;
                 margin: 0 0 0.4rem 0;
                 line-height: 1.1;
                 letter-spacing: -0.8px;

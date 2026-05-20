@@ -248,11 +248,11 @@ def render_monte_carlo_module() -> None:
     # -----------------------------------------------------------------------
     # Sidebar — jumlah variabel (Req 8.1)
     # -----------------------------------------------------------------------
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("### 🎰 Monte Carlo Simulation")
-    st.sidebar.markdown("**Langkah 1: Variabel Input**")
+    st.markdown("---")
+    st.markdown("### 🎰 Monte Carlo Simulation")
+    st.markdown("**Langkah 1: Variabel Input**")
 
-    n_variables: int = st.sidebar.number_input(
+    n_variables: int = st.number_input(
         label="Jumlah variabel input (1–10)",
         min_value=1,
         max_value=10,
@@ -273,17 +273,17 @@ def render_monte_carlo_module() -> None:
     variables_input: list[dict] = []
 
     for i in range(n_variables):
-        st.sidebar.markdown(f"**Variabel {i + 1}**")
+        st.markdown(f"**Variabel {i + 1}**")
 
         prev = prev_vars[i] if i < len(prev_vars) else {}
 
-        var_name: str = st.sidebar.text_input(
+        var_name: str = st.text_input(
             label=f"Nama variabel {i + 1}",
             value=prev.get("name", f"x{i + 1}"),
             key=f"mc_var_name_{i}",
         )
 
-        dist_type: str = st.sidebar.selectbox(
+        dist_type: str = st.selectbox(
             label=f"Distribusi variabel {i + 1}",
             options=dist_options,
             index=dist_options.index(prev.get("dist_type", "Normal")),
@@ -293,7 +293,7 @@ def render_monte_carlo_module() -> None:
         params: dict = {}
 
         if dist_type == "Normal":
-            col_mean, col_std = st.sidebar.columns(2)
+            col_mean, col_std = st.columns(2)
             with col_mean:
                 mean_val = st.number_input(
                     label="Mean",
@@ -313,7 +313,7 @@ def render_monte_carlo_module() -> None:
             params = {"mean": mean_val, "std": std_val}
 
         elif dist_type == "Uniform":
-            col_min, col_max = st.sidebar.columns(2)
+            col_min, col_max = st.columns(2)
             with col_min:
                 min_val = st.number_input(
                     label="Min",
@@ -333,7 +333,7 @@ def render_monte_carlo_module() -> None:
             params = {"min": min_val, "max": max_val}
 
         elif dist_type == "Triangular":
-            col_min2, col_mode, col_max2 = st.sidebar.columns(3)
+            col_min2, col_mode, col_max2 = st.columns(3)
             with col_min2:
                 tri_min = st.number_input(
                     label="Min",
@@ -372,12 +372,12 @@ def render_monte_carlo_module() -> None:
     # -----------------------------------------------------------------------
     # Sidebar — ekspresi output (Req 8.3)
     # -----------------------------------------------------------------------
-    st.sidebar.markdown("**Langkah 2: Ekspresi Output**")
+    st.markdown("**Langkah 2: Ekspresi Output**")
 
     var_names_preview = [v["name"] for v in variables_input if v["name"]]
     expr_placeholder = " + ".join(var_names_preview) if var_names_preview else "x1 + x2"
 
-    expr_input: str = st.sidebar.text_input(
+    expr_input: str = st.text_input(
         label="Ekspresi output simulasi",
         value=st.session_state.get("mc_expr_input", expr_placeholder),
         placeholder=expr_placeholder,
@@ -389,9 +389,9 @@ def render_monte_carlo_module() -> None:
     # -----------------------------------------------------------------------
     # Sidebar — jumlah iterasi (Req 8.5)
     # -----------------------------------------------------------------------
-    st.sidebar.markdown("**Langkah 3: Iterasi**")
+    st.markdown("**Langkah 3: Iterasi**")
 
-    n_iterations: int = st.sidebar.number_input(
+    n_iterations: int = st.number_input(
         label="Jumlah iterasi simulasi",
         min_value=100,
         max_value=10_000_000,
@@ -404,8 +404,8 @@ def render_monte_carlo_module() -> None:
     # -----------------------------------------------------------------------
     # Sidebar — tombol jalankan simulasi
     # -----------------------------------------------------------------------
-    st.sidebar.markdown("**Langkah 4: Jalankan**")
-    run_clicked = st.sidebar.button(
+    st.markdown("**Langkah 4: Jalankan**")
+    run_clicked = st.button(
         "🚀 Jalankan Simulasi",
         key="mc_run_btn",
         use_container_width=True,
@@ -438,7 +438,7 @@ def render_monte_carlo_module() -> None:
 
         if validation_errors:
             for err in validation_errors:
-                st.sidebar.error(f"❌ {err}")
+                st.error(f"❌ {err}")
             st.session_state["mc_run_result"] = None
         else:
             # --- Peringatan iterasi > 1.000.000 (Req 8.13) ---
@@ -479,7 +479,7 @@ def render_monte_carlo_module() -> None:
                             "result": result,
                             "stats": stats,
                         }
-                        st.sidebar.success(
+                        st.success(
                             f"✅ Simulasi selesai! {n_iterations:,} iterasi berhasil dijalankan."
                         )
 

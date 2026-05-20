@@ -1,4 +1,6 @@
-"""
+import os
+
+neobrutalism_css = '''"""
 ui/styles.py — Neobrutalism Gen-Z Edition
 """
 
@@ -39,7 +41,9 @@ def inject_custom_css() -> None:
     }}
 
     .stApp {{
-        background: {COLORS["background"]} !important;
+        background: {{COLORS["background"]}} !important;
+        background-image: radial-gradient(#000 1px, transparent 1px) !important;
+        background-size: 20px 20px !important;
     }}
 
     .main .block-container {{
@@ -267,3 +271,48 @@ def inject_custom_css() -> None:
     </style>
     """
     st.markdown(css, unsafe_allow_html=True)
+'''
+
+with open('ui/styles.py', 'w', encoding='utf-8') as f:
+    f.write(neobrutalism_css)
+
+# Update app.py hero section inline styles
+with open('app.py', 'r', encoding='utf-8') as f:
+    app_content = f.read()
+
+import re
+
+# We will just replace the specific hero card style block
+hero_old = """        <div style="
+            background: linear-gradient(135deg, {COLORS['primary']} 0%, #0F2347 100%);
+            border-radius: 16px;
+            padding: 2.5rem 2.2rem;
+            margin-bottom: 1.6rem;
+            border: 1px solid rgba(37,99,235,0.20);
+        ">"""
+
+hero_new = """        <div style="
+            background: {COLORS['accent2']};
+            border: 4px solid #000;
+            box-shadow: 8px 8px 0px #000;
+            padding: 2.5rem 2.2rem;
+            margin-bottom: 1.6rem;
+        ">"""
+
+app_content = app_content.replace(hero_old, hero_new)
+
+# Also fix the subtitle colors inside the hero card
+# Replace color: #FFFFFF; with color: #000; for the hero section paragraphs
+# Just replace `#FFFFFF` with `#000000` or `#000` in the render_welcome_page area
+
+app_content = app_content.replace('color: #FFFFFF;', 'color: #000;')
+app_content = app_content.replace('color: #DDE6ED;', 'color: #000;')
+app_content = app_content.replace('color: #8EACC2;', 'color: #000;')
+# also if there's rgba
+app_content = re.sub(r'color:\s*rgba\(255,\s*255,\s*255,\s*0\.85\);', 'color: #000;', app_content)
+app_content = re.sub(r'color:\s*rgba\(255,\s*255,\s*255,\s*0\.9\);', 'color: #000;', app_content)
+
+with open('app.py', 'w', encoding='utf-8') as f:
+    f.write(app_content)
+
+print("Applied Neobrutalism globally.")

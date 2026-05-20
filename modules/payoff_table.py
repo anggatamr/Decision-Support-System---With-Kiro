@@ -170,10 +170,10 @@ def render_payoff_table_module() -> None:
     # ------------------------------------------------------------------
     # Sidebar — dimensi tabel
     # ------------------------------------------------------------------
-    st.sidebar.markdown("---")
-    st.sidebar.subheader("⚙️ Dimensi Payoff Table")
+    st.markdown("---")
+    st.subheader("⚙️ Dimensi Payoff Table")
 
-    n_alt = st.sidebar.number_input(
+    n_alt = st.number_input(
         "Jumlah Alternatif",
         min_value=2,
         max_value=10,
@@ -182,7 +182,7 @@ def render_payoff_table_module() -> None:
         key="_sidebar_n_alt",
         help="Masukkan jumlah alternatif keputusan (2–10)",
     )
-    n_states = st.sidebar.number_input(
+    n_states = st.number_input(
         "Jumlah Kondisi Alam",
         min_value=2,
         max_value=10,
@@ -201,7 +201,7 @@ def render_payoff_table_module() -> None:
     # ------------------------------------------------------------------
     # Sidebar — nama alternatif
     # ------------------------------------------------------------------
-    st.sidebar.markdown("**Nama Alternatif:**")
+    st.markdown("**Nama Alternatif:**")
     alt_names_input: list[str] = []
     for i in range(int(n_alt)):
         default_alt = (
@@ -209,7 +209,7 @@ def render_payoff_table_module() -> None:
             if i < len(st.session_state["alt_names"])
             else f"Alternatif {i + 1}"
         )
-        name = st.sidebar.text_input(
+        name = st.text_input(
             f"Alternatif {i + 1}",
             value=default_alt,
             max_chars=50,
@@ -220,7 +220,7 @@ def render_payoff_table_module() -> None:
     # ------------------------------------------------------------------
     # Sidebar — nama kondisi alam
     # ------------------------------------------------------------------
-    st.sidebar.markdown("**Nama Kondisi Alam:**")
+    st.markdown("**Nama Kondisi Alam:**")
     state_names_input: list[str] = []
     for j in range(int(n_states)):
         default_state = (
@@ -228,7 +228,7 @@ def render_payoff_table_module() -> None:
             if j < len(st.session_state["state_names"])
             else f"Kondisi {j + 1}"
         )
-        name = st.sidebar.text_input(
+        name = st.text_input(
             f"Kondisi {j + 1}",
             value=default_state,
             max_chars=50,
@@ -239,7 +239,7 @@ def render_payoff_table_module() -> None:
     # ------------------------------------------------------------------
     # Sidebar — tombol konfirmasi dimensi
     # ------------------------------------------------------------------
-    if st.sidebar.button("✅ Konfirmasi Dimensi", key="_pt_confirm_btn", use_container_width=True):
+    if st.button("✅ Konfirmasi Dimensi", key="_pt_confirm_btn", use_container_width=True):
         st.session_state["_pt_confirmed"] = True
         st.session_state["_pt_n_alt"] = int(n_alt)
         st.session_state["_pt_n_states"] = int(n_states)

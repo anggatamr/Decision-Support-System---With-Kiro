@@ -250,11 +250,11 @@ def render_utility_module() -> None:
     # -----------------------------------------------------------------------
     # Sidebar — jumlah titik data (Req 7.1)
     # -----------------------------------------------------------------------
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("### ⚖️ Fungsi Utilitas")
-    st.sidebar.markdown("**Langkah 1: Titik Data**")
+    st.markdown("---")
+    st.markdown("### ⚖️ Fungsi Utilitas")
+    st.markdown("**Langkah 1: Titik Data**")
 
-    n_points: int = st.sidebar.number_input(
+    n_points: int = st.number_input(
         label="Jumlah titik data (3–20)",
         min_value=3,
         max_value=20,
@@ -267,7 +267,7 @@ def render_utility_module() -> None:
     # -----------------------------------------------------------------------
     # Sidebar — input pasangan (nilai moneter, utilitas) (Req 7.1)
     # -----------------------------------------------------------------------
-    st.sidebar.markdown("**Pasangan Nilai Moneter — Utilitas:**")
+    st.markdown("**Pasangan Nilai Moneter — Utilitas:**")
 
     monetary_vals: list[float] = []
     utility_vals: list[float] = []
@@ -277,7 +277,7 @@ def render_utility_module() -> None:
     prev_utility  = st.session_state.get("utility_utility_vals", [])
 
     for i in range(n_points):
-        col_m, col_u = st.sidebar.columns(2)
+        col_m, col_u = st.columns(2)
         default_m = float(prev_monetary[i]) if i < len(prev_monetary) else float(i * 100)
         default_u = float(prev_utility[i])  if i < len(prev_utility)  else round(i / max(n_points - 1, 1), 2)
 
@@ -309,12 +309,12 @@ def render_utility_module() -> None:
     # -----------------------------------------------------------------------
     # Sidebar — selector bentuk fungsi utilitas (Req 7.2)
     # -----------------------------------------------------------------------
-    st.sidebar.markdown("**Langkah 2: Bentuk Fungsi**")
+    st.markdown("**Langkah 2: Bentuk Fungsi**")
     func_options = list(UTILITY_FUNCTIONS.keys())  # ["Eksponensial", "Logaritmik", "Linear", "Kuadratik"]
     prev_func = st.session_state.get("utility_func_type", "Eksponensial")
     default_func_idx = func_options.index(prev_func) if prev_func in func_options else 0
 
-    func_type: str = st.sidebar.selectbox(
+    func_type: str = st.selectbox(
         label="Bentuk fungsi utilitas",
         options=func_options,
         index=default_func_idx,
@@ -325,8 +325,8 @@ def render_utility_module() -> None:
     # -----------------------------------------------------------------------
     # Sidebar — tombol "Fit Curve" (Req 7.3)
     # -----------------------------------------------------------------------
-    st.sidebar.markdown("**Langkah 3: Fit Kurva**")
-    fit_clicked = st.sidebar.button("🔧 Fit Curve", key="utility_fit_btn", use_container_width=True)
+    st.markdown("**Langkah 3: Fit Kurva**")
+    fit_clicked = st.button("🔧 Fit Curve", key="utility_fit_btn", use_container_width=True)
 
     # -----------------------------------------------------------------------
     # State untuk menyimpan hasil fitting
@@ -343,7 +343,7 @@ def render_utility_module() -> None:
 
         # Validasi utilitas dalam [0, 1]
         if np.any(y_data < 0.0) or np.any(y_data > 1.0):
-            st.sidebar.error("❌ Nilai utilitas harus berada dalam rentang [0, 1].")
+            st.error("❌ Nilai utilitas harus berada dalam rentang [0, 1].")
             st.session_state["utility_fit_result"] = None
         else:
             try:
@@ -363,11 +363,11 @@ def render_utility_module() -> None:
                     "x_data":       x_data,
                     "y_data":       y_data,
                 }
-                st.sidebar.success(f"✅ Fitting berhasil! R² = {r2:.4f}")
+                st.success(f"✅ Fitting berhasil! R² = {r2:.4f}")
 
             except ValueError as exc:
                 # Req 7.4 — tampilkan error jika gagal konvergen
-                st.sidebar.error(f"❌ {exc}")
+                st.error(f"❌ {exc}")
                 st.session_state["utility_fit_result"] = None
 
     # -----------------------------------------------------------------------
@@ -646,29 +646,21 @@ def render_utility_module() -> None:
         st.markdown("---")
         st.subheader("📐 Rumus Fungsi Utilitas")
 
-        latex_map = {
-            "Eksponensial": (
-                r"U(x) = 1 - e^{-x/R}",
-                f"di mana R = {popt[0]:.4f} (koefisien toleransi risiko)",
-            ),
-            "Logaritmik": (
-                r"U(x) = a \cdot \ln(x + b)",
-                f"di mana a = {popt[0]:.4f}, b = {popt[1]:.4f}",
-            ),
-            "Linear": (
-                r"U(x) = a \cdot x + b",
-                f"di mana a = {popt[0]:.6f}, b = {popt[1]:.4f}",
-            ),
-            "Kuadratik": (
-                r"U(x) = a \cdot x^2 + b \cdot x + c",
-                f"di mana a = {popt[0]:.6f}, b = {popt[1]:.6f}, c = {popt[2]:.4f}",
-            ),
-        }
-
-        latex_formula, param_desc = latex_map.get(
-            fitted_func_type,
-            (r"U(x) = f(x)", "Parameter tidak tersedia"),
-        )
+        if fitted_func_type == "Eksponensial":
+            latex_formula = r"U(x) = 1 - e^{-x/R}"
+            param_desc = f"di mana R = {popt[0]:.4f} (koefisien toleransi risiko)"
+        elif fitted_func_type == "Logaritmik":
+            latex_formula = r"U(x) = a \cdot \ln(x + b)"
+            param_desc = f"di mana a = {popt[0]:.4f}, b = {popt[1]:.4f}"
+        elif fitted_func_type == "Linear":
+            latex_formula = r"U(x) = a \cdot x + b"
+            param_desc = f"di mana a = {popt[0]:.6f}, b = {popt[1]:.4f}"
+        elif fitted_func_type == "Kuadratik":
+            latex_formula = r"U(x) = a \cdot x^2 + b \cdot x + c"
+            param_desc = f"di mana a = {popt[0]:.6f}, b = {popt[1]:.6f}, c = {popt[2]:.4f}"
+        else:
+            latex_formula = r"U(x) = f(x)"
+            param_desc = "Parameter tidak tersedia"
 
         st.latex(latex_formula)
         st.caption(f"**Parameter hasil fitting:** {param_desc}")
