@@ -1,242 +1,130 @@
 """
 ui/sidebar.py — Sidebar navigation for DSS Dashboard.
-
-Renders the left-panel navigation menu with:
-- Overall progress bar (X/8 modules complete)
-- Colored status badges per module (🟢 / ⚪)
-- Active module highlight
-- Module dependency hints
-
-CHANGELOG (Optimized):
-- Progress bar now uses inline HTML for more control
-- Branding text uses explicit white so it's always readable
-- Help tooltips improved
+Clean dark sidebar with full-text nav buttons and progress bar.
 """
 
 from __future__ import annotations
-
 import streamlit as st
 from ui.styles import COLORS
 
-# ---------------------------------------------------------------------------
-# Navigation registry
-# ---------------------------------------------------------------------------
-
 MODULES: list[tuple[str, str]] = [
     ("data_driven",    "📊 Data-Driven DSS"),
-    ("payoff_table",   "📋 Certainty — Payoff Table"),
-    ("ev_eol",         "🎲 Risk — EV & EOL"),
-    ("uncertainty",    "❓ Uncertainty — Kriteria"),
-    ("distribution",   "📈 Probabilistic — Distribusi"),
-    ("utility",        "⚖️ Utility — Fungsi Utilitas"),
-    ("monte_carlo",    "🎰 Simulation — Monte Carlo"),
-    ("recommendation", "🏆 Recommendation Engine"),
+    ("payoff_table",   "📋 Payoff Table"),
+    ("ev_eol",         "🎲 EV & EOL"),
+    ("uncertainty",    "❓ Uncertainty"),
+    ("distribution",   "📈 Distribusi"),
+    ("utility",        "⚖️ Fungsi Utilitas"),
+    ("monte_carlo",    "🎰 Monte Carlo"),
+    ("recommendation", "🏆 Rekomendasi"),
 ]
 
-# Modules that require payoff_table to be completed first
 _REQUIRES_PAYOFF = {"ev_eol", "uncertainty", "utility"}
 
 
-# ---------------------------------------------------------------------------
-# Public API
-# ---------------------------------------------------------------------------
-
 def render_sidebar() -> str | None:
-    """
-    Render sidebar navigation and return the key of the selected module.
-    """
     if "completed_modules" not in st.session_state:
         st.session_state["completed_modules"] = set()
     if "active_module" not in st.session_state:
         st.session_state["active_module"] = None
 
     completed: set[str] = st.session_state["completed_modules"]
-    total = len(MODULES)
     n_done = len(completed)
-    progress_pct = int(n_done / total * 100)
+    total = len(MODULES)
+    pct = int(n_done / total * 100)
 
     with st.sidebar:
-        # ------------------------------------------------------------------
-        # App branding
-        # ------------------------------------------------------------------
+        # ── Branding ──────────────────────────────────────────
         st.markdown(
             """
-            <div style="text-align: center; padding: 1rem 0 0.6rem 0;">
-                <div style="
-                    display: inline-flex;
-                    align-items: center;
-                    justify-content: center;
-                    width: 52px;
-                    height: 52px;
-                    background: rgba(36,113,163,0.35);
-                    border-radius: 14px;
-                    margin-bottom: 0.6rem;
-                    font-size: 1.6rem;
-                ">📊</div>
-                <p style="
-                    font-size: 1.1rem;
-                    font-weight: 800;
-                    margin: 0;
-                    color: #FFFFFF;
-                    letter-spacing: -0.3px;
-                    font-family: 'DM Sans', sans-serif;
-                ">Dashboard DSS</p>
-                <p style="
-                    font-size: 0.7rem;
-                    color: rgba(255,255,255,0.55);
-                    margin: 0.15rem 0 0 0;
-                    font-family: 'DM Sans', sans-serif;
-                    letter-spacing: 0.3px;
-                ">Decision Support System</p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-        st.markdown(
-            "<hr style='border-color: rgba(255,255,255,0.12); margin: 0.4rem 0 0.8rem 0;'>",
-            unsafe_allow_html=True,
-        )
-
-        # ------------------------------------------------------------------
-        # Progress bar — pure HTML for reliable contrast
-        # ------------------------------------------------------------------
-        st.markdown(
-            f"""
-            <div style="padding: 0 0.2rem; margin-bottom: 0.8rem;">
-                <div style="
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-bottom: 0.5rem;
-                ">
-                    <p style="
-                        font-size: 0.7rem;
-                        color: rgba(255,255,255,0.65);
-                        font-weight: 700;
-                        text-transform: uppercase;
-                        letter-spacing: 0.6px;
-                        margin: 0;
-                        font-family: 'DM Sans', sans-serif;
-                    ">Progress</p>
-                    <p style="
-                        font-size: 0.75rem;
-                        color: rgba(255,255,255,0.8);
-                        font-weight: 600;
-                        margin: 0;
-                        font-family: 'DM Sans', sans-serif;
-                    ">{n_done}/{total}</p>
-                </div>
-                <div style="
-                    background: rgba(255,255,255,0.12);
-                    border-radius: 8px;
-                    height: 8px;
-                    overflow: hidden;
-                ">
-                    <div style="
-                        background: linear-gradient(90deg, #2E86C1 0%, #1ABC9C 100%);
-                        width: {progress_pct}%;
-                        height: 100%;
-                        border-radius: 8px;
-                        transition: width 0.5s ease;
-                        min-width: {'8px' if n_done > 0 else '0'};
-                    "></div>
-                </div>
-                <p style="
-                    font-size: 0.68rem;
-                    color: rgba(255,255,255,0.45);
-                    margin: 0.3rem 0 0 0;
-                    text-align: right;
-                    font-family: 'DM Sans', sans-serif;
-                ">{progress_pct}% selesai</p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-        st.markdown(
-            "<hr style='border-color: rgba(255,255,255,0.12); margin: 0.4rem 0 0.6rem 0;'>",
-            unsafe_allow_html=True,
-        )
-
-        # ------------------------------------------------------------------
-        # Navigation label
-        # ------------------------------------------------------------------
-        st.markdown(
-            """
-            <p style="
-                font-size: 0.7rem;
-                color: rgba(255,255,255,0.55);
-                font-weight: 700;
-                text-transform: uppercase;
-                letter-spacing: 0.6px;
-                margin: 0 0 0.5rem 0;
-                font-family: 'DM Sans', sans-serif;
-            ">Navigasi Modul</p>
-            """,
-            unsafe_allow_html=True,
-        )
-
-        # ------------------------------------------------------------------
-        # Navigation buttons
-        # ------------------------------------------------------------------
-        for key, label in MODULES:
-            is_active = st.session_state["active_module"] == key
-            is_done = key in completed
-            needs_payoff = key in _REQUIRES_PAYOFF
-            payoff_missing = needs_payoff and "payoff_table" not in completed
-
-            status_dot = "🟢" if is_done else "⚪"
-            display_label = f"{status_dot} {label}"
-            button_type = "primary" if is_active else "secondary"
-
-            if st.button(
-                display_label,
-                key=f"nav_{key}",
-                use_container_width=True,
-                type=button_type,
-                help=(
-                    "⚠️ Selesaikan Payoff Table terlebih dahulu"
-                    if payoff_missing else
-                    f"Buka modul {label}"
-                ),
-            ):
-                st.session_state["active_module"] = key
-
-        # ------------------------------------------------------------------
-        # Home button
-        # ------------------------------------------------------------------
-        st.markdown(
-            "<hr style='border-color: rgba(255,255,255,0.12); margin: 0.6rem 0;'>",
-            unsafe_allow_html=True,
-        )
-
-        if st.button(
-            "🏠 Beranda",
-            key="nav_home",
-            use_container_width=True,
-            type="secondary",
-            help="Kembali ke halaman sambutan",
-        ):
-            st.session_state["active_module"] = None
-
-        # ------------------------------------------------------------------
-        # Footer
-        # ------------------------------------------------------------------
-        st.markdown(
-            """
-            <div style="text-align: center; padding: 0.8rem 0 0.3rem 0;">
-                <p style="
-                    font-size: 0.68rem;
-                    color: rgba(255,255,255,0.35);
-                    margin: 0;
-                    line-height: 1.7;
-                    font-family: 'DM Sans', sans-serif;
-                ">8 modul · 279 tests<br>Python + Streamlit<br>
-                <span style="color: rgba(255,255,255,0.2);">Built with Kiro</span>
+            <div style="text-align:center; padding:1.2rem 0 0.8rem;">
+                <div style="font-size:2rem; margin-bottom:0.4rem;">📊</div>
+                <p style="font-size:1.05rem; font-weight:800; color:#FFFFFF;
+                          margin:0; font-family:'Inter',sans-serif;">
+                    Dashboard DSS
+                </p>
+                <p style="font-size:0.72rem; color:rgba(255,255,255,0.5);
+                          margin:0.2rem 0 0; font-family:'Inter',sans-serif;">
+                    Decision Support System
                 </p>
             </div>
             """,
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            "<hr style='border:none;border-top:1px solid rgba(255,255,255,0.12);margin:0 0 0.8rem;'>",
+            unsafe_allow_html=True,
+        )
+
+        # ── Progress bar ──────────────────────────────────────
+        st.markdown(
+            f"""
+            <div style="padding:0 0.1rem; margin-bottom:0.9rem;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;">
+                    <span style="font-size:0.68rem; font-weight:700; color:rgba(255,255,255,0.55);
+                                 text-transform:uppercase; letter-spacing:0.7px;
+                                 font-family:'Inter',sans-serif;">Progress</span>
+                    <span style="font-size:0.72rem; font-weight:600; color:rgba(255,255,255,0.8);
+                                 font-family:'Inter',sans-serif;">{n_done}/{total} modul</span>
+                </div>
+                <div style="background:rgba(255,255,255,0.12); border-radius:6px; height:7px; overflow:hidden;">
+                    <div style="background:linear-gradient(90deg,#2563EB,#0EA5E9);
+                                width:{pct}%; height:100%; border-radius:6px;
+                                min-width:{'6px' if n_done>0 else '0'};"></div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            "<hr style='border:none;border-top:1px solid rgba(255,255,255,0.12);margin:0 0 0.6rem;'>",
+            unsafe_allow_html=True,
+        )
+
+        # ── Nav label ─────────────────────────────────────────
+        st.markdown(
+            "<p style='font-size:0.68rem; font-weight:700; color:rgba(255,255,255,0.5);"
+            "text-transform:uppercase; letter-spacing:0.7px; margin:0 0 0.5rem;"
+            "font-family:\"Inter\",sans-serif;'>Navigasi Modul</p>",
+            unsafe_allow_html=True,
+        )
+
+        # ── Nav buttons ───────────────────────────────────────
+        for key, label in MODULES:
+            is_active = st.session_state["active_module"] == key
+            is_done   = key in completed
+            needs_payoff = key in _REQUIRES_PAYOFF
+            payoff_missing = needs_payoff and "payoff_table" not in completed
+
+            dot = "🟢" if is_done else "⚪"
+            display = f"{dot} {label}"
+            btn_type = "primary" if is_active else "secondary"
+
+            if st.button(
+                display,
+                key=f"nav_{key}",
+                use_container_width=True,
+                type=btn_type,
+                help="Selesaikan Payoff Table dulu" if payoff_missing else None,
+            ):
+                st.session_state["active_module"] = key
+
+        # ── Divider + Home ────────────────────────────────────
+        st.markdown(
+            "<hr style='border:none;border-top:1px solid rgba(255,255,255,0.12);margin:0.6rem 0;'>",
+            unsafe_allow_html=True,
+        )
+
+        if st.button("🏠 Beranda", key="nav_home",
+                     use_container_width=True, type="secondary"):
+            st.session_state["active_module"] = None
+
+        # ── Footer ────────────────────────────────────────────
+        st.markdown(
+            "<p style='text-align:center; font-size:0.65rem; color:rgba(255,255,255,0.3);"
+            "margin:0.8rem 0 0; font-family:\"Inter\",sans-serif;'>"
+            "8 modul · 279 tests · Built with Kiro</p>",
             unsafe_allow_html=True,
         )
 
