@@ -585,6 +585,95 @@ def inject_custom_css() -> None:
         border: 1px solid {COLORS["background"]};
     }}
 
+    /* ============================================================ */
+    /* MOBILE RESPONSIVE                                             */
+    /* ============================================================ */
+    @media (max-width: 768px) {{
+        /* Reduce main container padding on mobile */
+        .main .block-container {{
+            padding: 1rem 1rem 2rem !important;
+            margin-top: 0.5rem !important;
+            border: 2px solid #000 !important;
+            box-shadow: 4px 4px 0px #000 !important;
+        }}
+
+        /* Smaller headings on mobile */
+        h1 {{
+            font-size: 1.5rem !important;
+            padding: 0.4rem 0.7rem !important;
+        }}
+        h2 {{ font-size: 1.3rem !important; }}
+        h3 {{ font-size: 1.1rem !important; }}
+
+        /* Hero section on mobile */
+        div[style*="padding: 2.5rem"] {{
+            padding: 1.2rem 1rem !important;
+        }}
+
+        /* Metric cards — reduce shadow on mobile */
+        [data-testid="stMetric"] {{
+            box-shadow: 3px 3px 0px #000 !important;
+            padding: 0.7rem 0.9rem !important;
+        }}
+
+        /* Buttons — full width on mobile */
+        .stButton > button {{
+            width: 100% !important;
+            box-shadow: 3px 3px 0px #000 !important;
+        }}
+
+        /* Charts — reduce border on mobile */
+        .stPlotlyChart {{
+            border: 2px solid #000 !important;
+            box-shadow: 4px 4px 0px #000 !important;
+        }}
+
+        /* Expanders — reduce shadow */
+        [data-testid="stExpander"] {{
+            box-shadow: 3px 3px 0px #000 !important;
+        }}
+
+        /* Alerts — reduce shadow */
+        .stAlert {{
+            box-shadow: 3px 3px 0px #000 !important;
+        }}
+
+        /* Sidebar — full width overlay on mobile */
+        section[data-testid="stSidebar"] {{
+            border-right: 2px solid #000 !important;
+        }}
+
+        /* Tables — horizontal scroll on mobile */
+        .stDataFrame {{
+            overflow-x: auto !important;
+            box-shadow: 3px 3px 0px #000 !important;
+        }}
+
+        /* Reduce font size for captions */
+        .stCaption,
+        [data-testid="stCaptionContainer"] p,
+        small {{
+            font-size: 0.75rem !important;
+        }}
+    }}
+
+    @media (max-width: 480px) {{
+        /* Extra small screens */
+        .main .block-container {{
+            padding: 0.75rem 0.75rem 1.5rem !important;
+        }}
+
+        h1 {{
+            font-size: 1.2rem !important;
+            letter-spacing: -0.5px !important;
+        }}
+
+        [data-testid="stMetricValue"],
+        [data-testid="stMetricValue"] > div {{
+            font-size: 1.2rem !important;
+        }}
+    }}
+
     </style>
     """
     st.markdown(css, unsafe_allow_html=True)

@@ -11,8 +11,149 @@ UI layer (render_monte_carlo_module) akan diimplementasikan pada task 12.5.
 
 from __future__ import annotations
 
+import ast
+import math
+import operator
 import numpy as np
-from typing import TypedDict
+from typing import TypedDict, Any
+
+
+# ---------------------------------------------------------------------------
+# Safe Expression Evaluator (replaces eval() for security)
+# ---------------------------------------------------------------------------
+
+# Allowed operators in expressions
+_OPERATORS: dict[type, Any] = {
+    ast.Add:  operator.add,
+    ast.Sub:  operator.sub,
+    ast.Mult: operator.mul,
+    ast.Div:  operator.truediv,
+    ast.Pow:  operator.pow,
+    ast.USub: operator.neg,
+    ast.UAdd: operator.pos,
+    ast.Mod:  operator.mod,
+    ast.FloorDiv: operator.floordiv,
+}
+
+# Allowed math functions (numpy-compatible for array inputs)
+_SAFE_FUNCTIONS: dict[str, Any] = {
+    "abs":   np.abs,
+    "sqrt":  np.sqrt,
+    "exp":   np.exp,
+    "log":   np.log,
+    "log10": np.log10,
+    "log2":  np.log2,
+    "sin":   np.sin,
+    "cos":   np.cos,
+    "tan":   np.tan,
+    "ceil":  np.ceil,
+    "floor": np.floor,
+    "round": np.round,
+    "min":   np.minimum,
+    "max":   np.maximum,
+    "sum":   np.sum,
+    "pi":    math.pi,
+    "e":     math.e,
+}
+
+
+def _eval_node(node: ast.AST, namespace: dict[str, Any]) -> Any:
+    """Recursively evaluate an AST node against a variable namespace."""
+    if isinstance(node, ast.Expression):
+        return _eval_node(node.body, namespace)
+
+    elif isinstance(node, ast.Constant):
+        if isinstance(node.value, (int, float)):
+            return node.value
+        raise ValueError(f"Konstanta tidak didukung: {node.value!r}")
+
+    elif isinstance(node, ast.Name):
+        name = node.id
+        if name in namespace:
+            return namespace[name]
+        if name in _SAFE_FUNCTIONS:
+            return _SAFE_FUNCTIONS[name]
+        raise NameError(f"Nama '{name}' tidak terdefinisi dalam ekspresi.")
+
+    elif isinstance(node, ast.BinOp):
+        op_type = type(node.op)
+        if op_type not in _OPERATORS:
+            raise ValueError(f"Operator tidak didukung: {op_type.__name__}")
+        left = _eval_node(node.left, namespace)
+        right = _eval_node(node.right, namespace)
+        return _OPERATORS[op_type](left, right)
+
+    elif isinstance(node, ast.UnaryOp):
+        op_type = type(node.op)
+        if op_type not in _OPERATORS:
+            raise ValueError(f"Operator unary tidak didukung: {op_type.__name__}")
+        operand = _eval_node(node.operand, namespace)
+        return _OPERATORS[op_type](operand)
+
+    elif isinstance(node, ast.Call):
+        func = _eval_node(node.func, namespace)
+        if not callable(func):
+            raise ValueError(f"'{node.func}' bukan fungsi yang dapat dipanggil.")
+        args = [_eval_node(arg, namespace) for arg in node.args]
+        if node.keywords:
+            raise ValueError("Keyword arguments tidak didukung dalam ekspresi simulasi.")
+        return func(*args)
+
+    elif isinstance(node, ast.Attribute):
+        # Allow np.sqrt, np.log, etc. via attribute access
+        obj = _eval_node(node.value, namespace)
+        attr = node.attr
+        if obj is np and hasattr(np, attr):
+            return getattr(np, attr)
+        raise ValueError(f"Akses atribut '{attr}' tidak diizinkan.")
+
+    else:
+        raise ValueError(
+            f"Konstruksi ekspresi tidak didukung: {type(node).__name__}. "
+            "Gunakan operasi aritmatika dasar dan fungsi matematika yang diizinkan."
+        )
+
+
+def safe_eval_expr(expr: str, namespace: dict[str, Any]) -> Any:
+    """
+    Evaluasi ekspresi matematis secara aman menggunakan AST parser.
+
+    Menggantikan eval() dengan parser AST yang hanya mengizinkan:
+    - Operasi aritmatika: +, -, *, /, **, %, //
+    - Fungsi matematika: abs, sqrt, exp, log, sin, cos, tan, ceil, floor, round, min, max, sum
+    - Konstanta: pi, e
+    - Variabel dari namespace yang diberikan
+    - Akses np.* untuk fungsi numpy
+
+    Parameters
+    ----------
+    expr : str
+        Ekspresi matematis yang akan dievaluasi.
+    namespace : dict
+        Variabel yang tersedia dalam ekspresi (nama → nilai/array).
+
+    Returns
+    -------
+    Any
+        Hasil evaluasi ekspresi (biasanya np.ndarray atau float).
+
+    Raises
+    ------
+    ValueError
+        Jika ekspresi mengandung konstruksi yang tidak diizinkan.
+    NameError
+        Jika ekspresi mereferensikan variabel yang tidak ada di namespace.
+    SyntaxError
+        Jika ekspresi memiliki sintaks Python yang tidak valid.
+    """
+    try:
+        tree = ast.parse(expr.strip(), mode="eval")
+    except SyntaxError as e:
+        raise SyntaxError(f"Sintaks ekspresi tidak valid: {e.msg}") from e
+
+    # Inject np into namespace for np.* calls
+    full_namespace = {"np": np, **namespace}
+    return _eval_node(tree, full_namespace)
 
 
 # ---------------------------------------------------------------------------
@@ -112,8 +253,8 @@ def run_monte_carlo(
     # Buat namespace dengan nama variabel → kolom input_matrix
     namespace = {v["name"]: input_matrix[:, i] for i, v in enumerate(variables)}
 
-    # Evaluasi ekspresi dengan namespace terbatas (keamanan)
-    output = eval(expr, {"__builtins__": {}}, {**namespace, "np": np})
+    # Evaluasi ekspresi dengan AST parser yang aman (menggantikan eval())
+    output = safe_eval_expr(expr, namespace)
     output = np.asarray(output, dtype=np.float64)
 
     # Hitung korelasi Spearman untuk sensitivity analysis

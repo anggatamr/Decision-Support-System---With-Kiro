@@ -115,7 +115,7 @@ def render_welcome_page() -> None:
                 text-transform: uppercase;
                 letter-spacing: 1.5px;
                 margin: 0 0 0.5rem 0;
-                font-family: 'Inter', sans-serif;
+                font-family: 'Space Grotesk', sans-serif;
             ">Sistem Pendukung Keputusan Akademik</p>
             <p style="
                 font-size: 2.4rem;
@@ -124,33 +124,33 @@ def render_welcome_page() -> None:
                 margin: 0 0 0.4rem 0;
                 line-height: 1.1;
                 letter-spacing: -0.8px;
-                font-family: 'Inter', sans-serif;
+                font-family: 'Space Grotesk', sans-serif;
             ">📊 Dashboard DSS</p>
             <p style="
                 font-size: 1rem;
                 color: rgba(255,255,255,0.78);
                 margin: 0 0 1.4rem 0;
-                font-family: 'Inter', sans-serif;
+                font-family: 'Space Grotesk', sans-serif;
             ">Platform analisis keputusan kuantitatif — Data-Driven &amp; Model-Driven DSS</p>
             <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
                 <span style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);
                              border-radius:20px;padding:0.28rem 0.85rem;font-size:0.78rem;
-                             font-weight:600;color:#FFFFFF;font-family:'Inter',sans-serif;">
+                             font-weight:600;color:#FFFFFF;font-family:'Space Grotesk',sans-serif;">
                     🧮 8 Modul Analisis
                 </span>
                 <span style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);
                              border-radius:20px;padding:0.28rem 0.85rem;font-size:0.78rem;
-                             font-weight:600;color:#FFFFFF;font-family:'Inter',sans-serif;">
+                             font-weight:600;color:#FFFFFF;font-family:'Space Grotesk',sans-serif;">
                     ✅ 279 Property Tests
                 </span>
                 <span style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);
                              border-radius:20px;padding:0.28rem 0.85rem;font-size:0.78rem;
-                             font-weight:600;color:#FFFFFF;font-family:'Inter',sans-serif;">
+                             font-weight:600;color:#FFFFFF;font-family:'Space Grotesk',sans-serif;">
                     🐍 Python + Streamlit
                 </span>
                 <span style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);
                              border-radius:20px;padding:0.28rem 0.85rem;font-size:0.78rem;
-                             font-weight:600;color:#FFFFFF;font-family:'Inter',sans-serif;">
+                             font-weight:600;color:#FFFFFF;font-family:'Space Grotesk',sans-serif;">
                     📐 LaTeX Formulas
                 </span>
             </div>
@@ -212,9 +212,9 @@ def render_welcome_page() -> None:
                     <span style="font-size:1rem;">{icon}</span>
                     <div>
                         <p style="margin:0;font-weight:700;font-size:0.86rem;
-                                  color:{COLORS['primary']};font-family:'Inter',sans-serif;">{name}</p>
+                                  color:{COLORS['primary']};font-family:'Space Grotesk',sans-serif;">{name}</p>
                         <p style="margin:0;font-size:0.73rem;color:{COLORS['mid_gray']};
-                                  font-family:'Inter',sans-serif;">{desc}</p>
+                                  font-family:'Space Grotesk',sans-serif;">{desc}</p>
                     </div>
                 </div>""",
                 unsafe_allow_html=True,
@@ -241,9 +241,9 @@ def render_welcome_page() -> None:
                                box-shadow:0 1px 6px rgba(0,0,0,0.06);">
                     <p style="font-size:1.5rem;margin:0 0 0.5rem;">{icon}</p>
                     <p style="font-weight:700;color:{COLORS['primary']};margin:0 0 0.35rem;
-                              font-family:'Inter',sans-serif;font-size:0.95rem;">{title}</p>
+                              font-family:'Space Grotesk',sans-serif;font-size:0.95rem;">{title}</p>
                     <p style="color:{COLORS['body_text']};font-size:0.83rem;margin:0;
-                              line-height:1.6;font-family:'Inter',sans-serif;">{desc}</p>
+                              line-height:1.6;font-family:'Space Grotesk',sans-serif;">{desc}</p>
                 </div>""",
                 unsafe_allow_html=True,
             )
@@ -269,14 +269,14 @@ def render_welcome_page() -> None:
                 f"""<div style="background:{COLORS['accent']};color:#FFFFFF;border-radius:50%;
                     width:36px;height:36px;display:flex;align-items:center;justify-content:center;
                     font-weight:800;font-size:0.95rem;margin-top:0.15rem;
-                    font-family:'Inter',sans-serif;">{num}</div>""",
+                    font-family:'Space Grotesk',sans-serif;">{num}</div>""",
                 unsafe_allow_html=True,
             )
         with cc:
             st.markdown(f"**{icon} {title}**")
             st.markdown(
                 f"<p style='color:{COLORS['body_text']};font-size:0.88rem;margin:0;line-height:1.6;"
-                f"font-family:\"Inter\",sans-serif;'>{desc}</p>",
+                f"font-family:'Space Grotesk',sans-serif;'>{desc}</p>",
                 unsafe_allow_html=True,
             )
         st.markdown("")

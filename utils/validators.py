@@ -408,10 +408,9 @@ def validate_sim_expression(expr: str, var_names: list[str]) -> tuple[bool, str]
 
     Strategi:
     1. Cek ekspresi tidak kosong
-    2. Coba eval dengan nilai dummy (1.0) untuk setiap variabel
-       menggunakan namespace terbatas {"__builtins__": {}} untuk keamanan
-    3. Tangkap NameError (variabel tidak terdefinisi), SyntaxError,
-       ZeroDivisionError, dan exception lainnya
+    2. Parse dengan AST untuk memastikan sintaks valid
+    3. Evaluasi dengan nilai dummy (1.0) menggunakan safe_eval_expr
+    4. Tangkap NameError, SyntaxError, ValueError, dan exception lainnya
 
     Returns
     -------
@@ -421,24 +420,28 @@ def validate_sim_expression(expr: str, var_names: list[str]) -> tuple[bool, str]
     if not expr or not expr.strip():
         return False, "Ekspresi output tidak boleh kosong."
 
+    # Import safe evaluator dari monte_carlo module
+    try:
+        from modules.monte_carlo import safe_eval_expr
+    except ImportError:
+        # Fallback ke eval terbatas jika import gagal
+        safe_eval_expr = None  # type: ignore[assignment]
+
     # Buat namespace dengan nilai dummy untuk setiap variabel
     dummy_values: dict[str, float] = {name: 1.0 for name in var_names}
 
-    # Namespace aman: tanpa builtins, hanya variabel dummy + fungsi matematika dasar
-    safe_namespace: dict[str, Any] = {
-        "__builtins__": {},
-        "abs": abs,
-        "min": min,
-        "max": max,
-        "sum": sum,
-        "round": round,
-        "pow": pow,
-        **dummy_values,
-    }
-
     try:
-        result = eval(expr.strip(), safe_namespace)  # noqa: S307
-        # Pastikan hasil dapat digunakan sebagai angka
+        if safe_eval_expr is not None:
+            result = safe_eval_expr(expr.strip(), dummy_values)
+        else:
+            # Fallback: eval dengan namespace terbatas
+            safe_namespace: dict[str, Any] = {
+                "__builtins__": {},
+                "abs": abs, "min": min, "max": max,
+                "sum": sum, "round": round, "pow": pow,
+                **dummy_values,
+            }
+            result = eval(expr.strip(), safe_namespace)  # noqa: S307
         float(result)
     except SyntaxError as e:
         return (
@@ -447,7 +450,6 @@ def validate_sim_expression(expr: str, var_names: list[str]) -> tuple[bool, str]
             "Periksa tanda kurung, operator, dan penulisan ekspresi.",
         )
     except NameError as e:
-        # Ekstrak nama variabel yang tidak dikenal dari pesan error
         return (
             False,
             f"Ekspresi mereferensikan variabel yang tidak terdefinisi: {e}. "
@@ -458,6 +460,11 @@ def validate_sim_expression(expr: str, var_names: list[str]) -> tuple[bool, str]
             False,
             "Ekspresi menghasilkan pembagian dengan nol pada nilai dummy. "
             "Pastikan ekspresi tidak membagi dengan variabel yang bisa bernilai 0.",
+        )
+    except ValueError as e:
+        return (
+            False,
+            f"Ekspresi mengandung konstruksi yang tidak diizinkan: {e}.",
         )
     except TypeError as e:
         return (
