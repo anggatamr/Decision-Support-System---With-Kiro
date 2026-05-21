@@ -739,7 +739,7 @@ def render_monte_carlo_module() -> None:
             name="CDF Empiris",
             line=dict(color=COLORS["accent"], width=2.5),
             fill="tozeroy",
-            fillcolor=f"{COLORS['accent']}22",
+            fillcolor="rgba(193,255,114,0.13)",
         ))
 
         # Garis P5 dan P95

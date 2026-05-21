@@ -126,17 +126,17 @@ _DIST_MAP: dict[str, Any] = {
 # Cara meneruskan params ke scipy.stats.<dist>.stats()
 # Setiap entry adalah fungsi (params_dict) -> args_tuple
 _PARAMS_TO_ARGS: dict[str, Any] = {
-    # Normal: params = {"mu": ..., "sigma": ...}  atau tuple (mu, sigma)
-    "Normal":      lambda p: (p["mu"], 0, p["sigma"]),          # loc=mu, scale=sigma
-    # Poisson: params = {"lambda": ...}
+    # Normal: loc=mu, scale=sigma  (do NOT pass 3 args — 3rd would collide with moments kwarg)
+    "Normal":      lambda p: (p["mu"], p["sigma"]),             # loc=mu, scale=sigma
+    # Poisson: mu=lambda
     "Poisson":     lambda p: (p["lambda"],),
-    # Exponential: params = {"lambda": ...}  → scale = 1/lambda
+    # Exponential: loc=0, scale=1/lambda
     "Exponential": lambda p: (0, 1.0 / p["lambda"]),            # loc=0, scale=1/lambda
-    # Uniform: params = {"a": ..., "b": ...}  → loc=a, scale=b-a
+    # Uniform: loc=a, scale=b-a
     "Uniform":     lambda p: (p["a"], p["b"] - p["a"]),         # loc=a, scale=b-a
-    # Binomial: params = {"n": ..., "p": ...}
+    # Binomial: n, p
     "Binomial":    lambda p: (p["n"], p["p"]),
-    # Beta: params = {"alpha": ..., "beta": ...}
+    # Beta: a, b
     "Beta":        lambda p: (p["alpha"], p["beta"]),
 }
 
@@ -165,6 +165,7 @@ def compute_dist_stats(dist_type: str, params: dict) -> dict:
     """
     dist = _DIST_MAP[dist_type]
     args = _PARAMS_TO_ARGS[dist_type](params)
+    # Pass args as positional, moments as explicit keyword to avoid collision
     mean, var, skew, kurt = dist.stats(*args, moments="mvsk")
     return {
         "mean":     float(mean),

@@ -37,9 +37,9 @@ def render_sidebar() -> str | None:
         st.markdown(
             f"""<div style="text-align:center;padding:1rem 0 0.6rem;">
                 <p style="font-size:1.1rem;font-weight:800;color:#FFFFFF;margin:0;
-                          font-family:'Inter',sans-serif;">📊 Dashboard DSS</p>
+                          font-family:'Space Grotesk',sans-serif;">📊 Dashboard DSS</p>
                 <p style="font-size:0.72rem;color:rgba(255,255,255,0.55);margin:0.1rem 0 0;
-                          font-family:'Inter',sans-serif;">Decision Support System</p>
+                          font-family:'Space Grotesk',sans-serif;">Decision Support System</p>
             </div>""",
             unsafe_allow_html=True,
         )
@@ -55,9 +55,9 @@ def render_sidebar() -> str | None:
                 <div style="display:flex;justify-content:space-between;margin-bottom:0.35rem;">
                     <span style="font-size:0.68rem;font-weight:700;color:rgba(255,255,255,0.55);
                                  text-transform:uppercase;letter-spacing:0.6px;
-                                 font-family:'Inter',sans-serif;">Progress</span>
+                                 font-family:'Space Grotesk',sans-serif;">Progress</span>
                     <span style="font-size:0.72rem;font-weight:600;color:rgba(255,255,255,0.80);
-                                 font-family:'Inter',sans-serif;">{n_done}/{total}</span>
+                                 font-family:'Space Grotesk',sans-serif;">{n_done}/{total}</span>
                 </div>
                 <div style="background:rgba(255,255,255,0.15);border-radius:6px;height:7px;overflow:hidden;">
                     <div style="background:linear-gradient(90deg,#3B82F6,#06B6D4);
@@ -76,7 +76,7 @@ def render_sidebar() -> str | None:
         st.markdown(
             "<p style='font-size:0.68rem;font-weight:700;color:rgba(255,255,255,0.50);"
             "text-transform:uppercase;letter-spacing:0.6px;margin:0 0 0.4rem;"
-            "font-family:\"Inter\",sans-serif;'>Navigasi Modul</p>",
+            "font-family:Space Grotesk,sans-serif;'>Navigasi Modul</p>",
             unsafe_allow_html=True,
         )
 
@@ -111,7 +111,7 @@ def render_sidebar() -> str | None:
 
         st.markdown(
             "<p style='text-align:center;font-size:0.63rem;color:rgba(255,255,255,0.28);"
-            "margin:0.6rem 0 0;font-family:\"Inter\",sans-serif;'>"
+            "margin:0.6rem 0 0;font-family:Space Grotesk,sans-serif;'>"
             "8 modul · 279 tests · Built with Kiro</p>",
             unsafe_allow_html=True,
         )
