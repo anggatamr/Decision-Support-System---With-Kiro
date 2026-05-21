@@ -1,33 +1,71 @@
 # 🚀 DSS Dashboard: The Gen Z Decision Support System
 
-Welcome to the **Decision Support System (DSS) Dashboard**! This project is a Streamlit-based web application designed to help you make complex decisions under certainty, risk, and uncertainty, all wrapped up in a sleek, high-contrast **Neobrutalism** aesthetic.
+Welcome to the **Decision Support System (DSS) Dashboard**! A Streamlit-based web application for making complex decisions under certainty, risk, and uncertainty — wrapped in a sleek, high-contrast **Neobrutalism** aesthetic.
 
-Made with ⚡ by **Kiro** and **Antigravity**.
+Made with ⚡ by **Kiro** and **Angga Tamara**.
 
-## 🎨 What's New? (Neobrutalist UI Overhaul)
-We completely transformed the dashboard to vibe with modern design trends:
-- **Bold Aesthetics:** Space Grotesk typography, harsh black borders (`4px solid #000`), and thick drop-shadows.
-- **High-Contrast Colors:** Lime Green, Hot Pink, Cyan, and Bright Yellow against a clean background for maximum readability.
-- **Better UX:** Moved all input widgets from the cluttered sidebar directly into the main interface to make it accessible and intuitive.
+---
 
-## 🛠️ Features (The 8 Modules)
-1. **Data-Driven DSS 📊:** Upload your CSV data and let the app automatically generate insights, distributions, and correlations.
-2. **Payoff Table 📋:** The foundation for decision making. Map out your Alternatives against different Conditions/States of nature.
-3. **EV & EOL (Risk) 🎲:** Calculate Expected Value and Expected Opportunity Loss when probabilities are known.
-4. **Uncertainty ❓:** Make decisions when you have zero clue what will happen using Maximax, Maximin, and Laplace criteria.
-5. **Distribution 📈:** Estimate probability distributions (Normal, Binomial, Poisson, etc.) from your data and visualize their PDF/PMF.
-6. **Utility ⚖️:** Define your Risk Preference (Risk Averse, Neutral, Seeking) by fitting a curve to your Utility Function data points.
-7. **Monte Carlo 🎰:** Run thousands of random simulations based on your data to predict future outcomes.
-8. **Recommendation Engine 🏆:** A one-stop consensus engine that aggregates results from all methods to give you the ultimate best choice.
+## ✨ Latest Updates
+
+### v2.0 — UI/UX & Security Improvements
+- **Font consistency** — Space Grotesk applied uniformly across all components
+- **Safe expression evaluator** — Monte Carlo `eval()` replaced with AST-based parser; blocks `__import__`, `exec`, `open`, and all non-math constructs
+- **Mobile responsive CSS** — `@media` breakpoints for 768px and 480px screens
+- **73 edge case unit tests** — equal payoffs, single alt/state, negative payoffs, large values, probability boundary, security tests
+- **Bug fixes:**
+  - Distribution stats: fixed `_parse_args_stats() got multiple values for 'moments'`
+  - Monte Carlo CDF: fixed invalid 8-digit hex `fillcolor` for Plotly
+  - Sidebar: fixed escaped quote rendering (`keyboard_double` text artifact)
+
+---
+
+## 🎨 Design System (Neobrutalism)
+- **Typography:** Space Grotesk — consistent across all UI elements
+- **Colors:** Lime Green `#c1ff72`, Hot Pink `#ff66c4`, Cyan `#5ce1e6`, Yellow `#ffde59`
+- **Style:** 4px solid black borders, thick drop-shadows, zero border-radius
+- **Sidebar:** Yellow background with white nav buttons and progress indicator
+
+---
+
+## 🛠️ The 8 Modules
+
+| # | Module | Description |
+|---|--------|-------------|
+| 1 | 📊 Data-Driven DSS | Upload CSV/Excel, explore stats, trends, correlations |
+| 2 | 📋 Payoff Table | Define alternatives, states of nature, and payoff values |
+| 3 | 🎲 EV & EOL | Expected Value, Expected Opportunity Loss, EVPI |
+| 4 | ❓ Uncertainty | Maximax, Maximin, Minimax Regret, Laplace criteria |
+| 5 | 📈 Distribusi | MLE parameter estimation, PDF/PMF charts, bootstrap CI |
+| 6 | ⚖️ Fungsi Utilitas | Risk preference curve fitting (averse/neutral/seeking) |
+| 7 | 🎰 Monte Carlo | Stochastic simulation + Spearman sensitivity tornado chart |
+| 8 | 🏆 Rekomendasi | Consensus engine aggregating all methods |
+
+---
+
+## 🔬 Testing
+
+```
+279 property-based tests (Hypothesis) — all passing
+ 73 edge case unit tests (pytest)      — all passing
+```
+
+Run tests:
+```bash
+pytest tests/ -v
+```
+
+---
 
 ## 📂 Example Files
-To help you get started immediately, we've included some plug-and-play example files:
-- `example_dataset.csv`: A sample Gen Z startup metrics dataset for the **Data-Driven DSS**.
-- `example_payoff.csv`: A ready-to-use matrix showing payoff values for different career choices under various market conditions.
-- Check out `dss_guide.md` for a quick, stress-free tutorial on how to use everything!
+
+- `example_dataset.csv` — sample startup metrics for Data-Driven DSS
+- `example_payoff.csv` — ready-to-use payoff matrix for career decisions
+- `dss_guide.md` — quick tutorial on using all 8 modules
+
+---
 
 ## 🚀 How to Run Locally
-Make sure you have Python installed, then run:
 
 ```bash
 pip install -r requirements.txt
